@@ -1,0 +1,15 @@
+function(init)
+    unset(kit_sources CACHE)
+endfunction()
+
+function(add_sources)
+    set(srcs)
+    foreach(s IN LISTS ARGN)
+        if (NOT IS_ABSOLUTE "${s}")
+            get_filename_component(s "${s}" ABSOLUTE)
+        endif ()
+        list(APPEND srcs "${s}")
+    endforeach()
+
+    set(source_list ${source_list} "${srcs}" CACHE INTERNAL "")
+endfunction()
