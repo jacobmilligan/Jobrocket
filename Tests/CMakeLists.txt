@@ -20,5 +20,6 @@ function(add_test test_name)
     list(APPEND test_list "${test_name}")
 endfunction()
 
-add_test(TestQueue TestQueue.cpp)
 
+add_test(TestQueue TestQueue.cpp)
+add_test(TestWorkers TestWorker.cpp)

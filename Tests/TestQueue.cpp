@@ -62,6 +62,7 @@ private:
 
     uint64_t random_index()
     {
+        // xorshift+
         static std::random_device rd;
         static uint64_t s[2] = {
             (uint64_t(rd()) << 32) ^ (rd()),

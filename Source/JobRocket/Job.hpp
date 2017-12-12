@@ -12,6 +12,7 @@
 #pragma once
 
 #include "JobRocket/Meta/Apply.hpp"
+#include "JobRocket/NumericTypes.hpp"
 
 #include <tuple>
 
@@ -32,7 +33,7 @@ struct JobFunction : JobFunctionBase {
           arg_tuple(std::tuple<Args...>(args...))
     {}
 
-    constexpr uint32_t size()
+    constexpr u32 size()
     {
         return sizeof(JobFunction<Fn, Args...>);
     }
@@ -52,7 +53,7 @@ struct Job {
     };
 
     State state;
-    uint8_t function[64 - sizeof(state)]{};
+    u8 function[64 - sizeof(state)]{};
 
     Job()
         : state(State::unknown)

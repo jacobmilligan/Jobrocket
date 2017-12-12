@@ -12,6 +12,7 @@
 #pragma once
 
 #include "JobRocket/Job.hpp"
+#include "JobRocket/NumericTypes.hpp"
 
 #include <atomic>
 #include <vector>
@@ -47,6 +48,17 @@ public:
           bottom_(other.bottom_.load()),
           top_(other.top_.load())
     {}
+
+    StaticWorkStealingQueue& operator=(StaticWorkStealingQueue&& other) noexcept
+    {
+        jobs_ = std::move(other.jobs_);
+        capacity_ = other.capacity_;
+        size_ = other.size_.load();
+        bottom_ = other.bottom_.load();
+        top_ = other.top_.load();
+
+        return *this;
+    }
 
     /// @brief Pushes a new job onto the bottom of the queue - must be called from owning thread
     /// @param job
@@ -146,10 +158,10 @@ public:
         return b <= t;
     }
 private:
-    const size_t capacity_{0};
-    std::atomic<uint64_t> size_{0};
-    std::atomic<uint64_t> top_{0};
-    std::atomic<uint64_t> bottom_{0};
+    size_t capacity_{0};
+    std::atomic<u64> size_{0};
+    std::atomic<u64> top_{0};
+    std::atomic<u64> bottom_{0};
 
     std::vector<Job> jobs_;
 };
