@@ -1,6 +1,0 @@
-/Applications/CLion.app/Contents/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Release -G "CodeBlocks - Unix Makefiles" /Users/Jacob/Dev/Repos/JobRocket
--- Could NOT find Vulkan (missing: VULKAN_LIBRARY VULKAN_INCLUDE_DIR) 
--- Using Cocoa for window creation
--- Configuring done
--- Generating done
--- Build files have been written to: /Users/Jacob/Dev/Repos/JobRocket/cmake-build-release
