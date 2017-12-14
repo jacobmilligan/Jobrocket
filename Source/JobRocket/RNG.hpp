@@ -46,7 +46,7 @@ struct xoroshiro128 {
         u64 s0 = 0;
         u64 s1 = 0;
         for ( u64 i : JUMP )
-            for(s32 b = 0; b < 64; b++) {
+            for(i32 b = 0; b < 64; b++) {
                 if ( i & UINT64_C(1) << b) {
                     s0 ^= state[0];
                     s1 ^= state[1];
@@ -60,7 +60,7 @@ struct xoroshiro128 {
 private:
     u64 state[2];
 
-    static inline u64 rotl(const u64 x, s32 k) {
+    static inline u64 rotl(const u64 x, i32 k) {
         return (x << k) | (x >> (64 - k));
     }
 };

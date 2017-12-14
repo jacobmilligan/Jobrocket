@@ -22,6 +22,13 @@ namespace sky {
 
 class Worker {
 public:
+    enum class State {
+        ready,
+        running,
+        waiting,
+        terminated
+    };
+
     Worker() = default;
 
     Worker(const u32 id, Worker* workers, const u32 num_workers, const u32 max_jobs)
@@ -30,7 +37,8 @@ public:
           rand_(1, 2),
           id_(id),
           num_workers_(num_workers),
-          workers_(workers)
+          workers_(workers),
+          state_(State::ready)
     {}
 
     ~Worker()
@@ -49,7 +57,8 @@ public:
           id_(other.id_),
           num_workers_(other.num_workers_),
           workers_(other.workers_),
-          active_(other.active_)
+          active_(other.active_),
+          state_(other.state_)
     {}
 
     Worker& operator=(Worker&& other) noexcept
@@ -61,6 +70,7 @@ public:
         num_workers_ = other.num_workers_;
         workers_ = other.workers_;
         active_ = other.active_;
+        state_ = other.state_;
 
         return *this;
     }
@@ -69,6 +79,12 @@ public:
     {
         active_ = true;
         thread_ = std::thread(&Worker::main_proc, this);
+
+        while ( true ) {
+            if ( state_ == Worker::State::running ) {
+                break;
+            }
+        }
     }
 
     void stop()
@@ -77,6 +93,8 @@ public:
         if ( thread_.joinable() ) {
             thread_.join();
         }
+
+        state_ = State::terminated;
     }
 
     void schedule_job(const Job& job)
@@ -84,29 +102,19 @@ public:
         queue_.push(job);
     }
 
-private:
-    std::thread thread_;
-    StaticWorkStealingQueue queue_;
-    xoroshiro128 rand_{1, 2};
-
-    std::condition_variable cv_;
-    std::mutex mutex_;
-
-    u32 id_{0};
-    u32 num_workers_{0};
-    Worker* workers_{nullptr};
-    bool active_{false};
-
-    void main_proc()
+    bool owns_this_thread()
     {
-        sky::Job* job = nullptr;
+        return thread_.get_id() == std::this_thread::get_id();
+    }
 
-        while ( active_ ) {
-            job = get_next_job();
-            if ( job != nullptr ) {
-                job->execute();
-            }
-        }
+    inline State state()
+    {
+        return state_;
+    }
+
+    inline u32 id()
+    {
+        return id_;
     }
 
     Job* get_next_job()
@@ -127,6 +135,33 @@ private:
         }
 
         return nullptr;
+    }
+
+private:
+    std::thread thread_;
+    StaticWorkStealingQueue queue_;
+    xoroshiro128 rand_{1, 2};
+
+    std::condition_variable cv_;
+    std::mutex mutex_;
+
+    u32 id_{0};
+    u32 num_workers_{0};
+    Worker* workers_{nullptr};
+    bool active_{false};
+    State state_;
+
+    void main_proc()
+    {
+        sky::Job* job = nullptr;
+        state_ = State::running;
+
+        while ( active_ ) {
+            job = get_next_job();
+            if ( job != nullptr ) {
+                job->execute();
+            }
+        }
     }
 };
 

@@ -21,9 +21,7 @@ bool completed = false;
 double big_calculation(double* values, const sky::u32 value)
 {
     constexpr size_t num_iterations = 100;
-    static sky::u32 iteration = num_jobs;
-
-    --iteration;
+    static std::atomic<sky::u32> iteration(num_jobs);
 
     auto result = 0.0;
     values[value] = 0.0;
@@ -32,7 +30,8 @@ double big_calculation(double* values, const sky::u32 value)
         values[value] += sin(value) + cos(value);
     }
 
-    if ( iteration <= 0 ) {
+    auto new_iteration = --iteration;
+    if ( new_iteration <= 0 ) {
         completed = true;
     }
 
