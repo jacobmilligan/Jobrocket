@@ -12,8 +12,6 @@
 #pragma once
 
 
-#include "JobRocket/NumericTypes.hpp"
-
 namespace sky {
 
 
@@ -21,14 +19,14 @@ namespace sky {
 // David Blackman & Sebastiano Vigna (2016).
 // Available at: http://xoroshiro.di.unimi.it/ [Accessed 11 Dec. 2017].
 struct xoroshiro128 {
-    xoroshiro128(const u64 seed_a, const u64 seed_b)
+    xoroshiro128(const uint64_t seed_a, const uint64_t seed_b)
         : state{seed_a, seed_b}
     {}
 
-    u64 next() {
-        const u64 s0 = state[0];
-        u64 s1 = state[1];
-        const u64 result = s0 + s1;
+    uint64_t next() {
+        const uint64_t s0 = state[0];
+        uint64_t s1 = state[1];
+        const uint64_t result = s0 + s1;
 
         s1 ^= s0;
         state[0] = rotl(s0, 55) ^ s1 ^ (s1 << 14); // a, b
@@ -41,12 +39,12 @@ struct xoroshiro128 {
     // to 2^64 calls to next(); it can be used to generate 2^64
     // non-overlapping subsequences for parallel computations.
     void jump() {
-        static const u64 JUMP[] = { 0xbeac0467eba5facb, 0xd86b048b86aa9922 };
+        static const uint64_t JUMP[] = { 0xbeac0467eba5facb, 0xd86b048b86aa9922 };
 
-        u64 s0 = 0;
-        u64 s1 = 0;
-        for ( u64 i : JUMP )
-            for(i32 b = 0; b < 64; b++) {
+        uint64_t s0 = 0;
+        uint64_t s1 = 0;
+        for ( uint64_t i : JUMP )
+            for(int32_t b = 0; b < 64; b++) {
                 if ( i & UINT64_C(1) << b) {
                     s0 ^= state[0];
                     s1 ^= state[1];
@@ -58,9 +56,9 @@ struct xoroshiro128 {
         state[1] = s1;
     }
 private:
-    u64 state[2];
+    uint64_t state[2];
 
-    static inline u64 rotl(const u64 x, i32 k) {
+    static inline uint64_t rotl(const uint64_t x, int32_t k) {
         return (x << k) | (x >> (64 - k));
     }
 };

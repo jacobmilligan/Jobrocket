@@ -15,14 +15,13 @@
 
 namespace sky {
 
-thread_local Worker* Scheduler::this_thread_worker_ = nullptr;
 
 Scheduler::~Scheduler()
 {
     shutdown();
 }
 
-u32 Scheduler::default_thread_count()
+uint32_t Scheduler::default_thread_count()
 {
     if ( num_cores_ == 0 || num_hw_threads_ == 0 ) {
         hwloc_topology_t topology;
@@ -41,20 +40,22 @@ u32 Scheduler::default_thread_count()
     return num_cores_;
 }
 
-void Scheduler::startup(const i32 num_threads, const u32 worker_job_capacity)
+void Scheduler::startup(const int32_t num_threads, const uint32_t worker_job_capacity)
 {
     if ( num_threads <= auto_worker_count ) {
         num_workers_ = default_thread_count();
     } else {
-        num_workers_ = static_cast<u32>(num_threads);
+        num_workers_ = static_cast<uint32_t>(num_threads);
     }
 
     workers_.resize(num_workers_);
-    u32 worker_id = 0;
+    uint32_t worker_id = 0;
     for ( auto& w : workers_ ) {
         w = std::move(sky::Worker(worker_id++, workers_.data(), num_workers_, worker_job_capacity));
     }
 
+    // Start all worker threads except for worker 0. Worker 0 is reserved for the main thread so
+    // needs no worker thread
     for ( auto& w : workers_ ) {
         if ( w.id() > 0 ) {
             w.start();
@@ -69,23 +70,39 @@ void Scheduler::shutdown()
     }
 }
 
-void Scheduler::run_job(Job& job)
+Worker* Scheduler::find_local_worker()
 {
-    if ( this_thread_worker_ == nullptr ) {
-        for ( int w = 0; w < workers_.size(); ++w ) {
-            if ( workers_[w].owns_this_thread() ) {
-                this_thread_worker_ = &workers_[w];
-                break;
-            }
-        }
-
-        if ( this_thread_worker_ == nullptr ) {
-            this_thread_worker_ = &workers_[0];
+    for ( int w = 0; w < workers_.size(); ++w ) {
+        if ( workers_[w].owns_this_thread() ) {
+            return &workers_[w];
         }
     }
 
-    this_thread_worker_->schedule_job(job);
+    // Main thread
+    return &workers_[0];
 }
 
+Worker* Scheduler::thread_local_worker()
+{
+    static thread_local Worker* local_worker = find_local_worker();
+
+    return local_worker;
+}
+
+void Scheduler::run_job(Job& job)
+{
+    thread_local_worker()->schedule_job(job);
+}
+
+void Scheduler::wait(Job& job)
+{
+    Job* next_job = nullptr;
+    while ( job.state != Job::State::completed ) {
+        next_job = thread_local_worker()->get_next_job();
+        if ( next_job != nullptr ) {
+            next_job->execute();
+        }
+    }
+}
 
 }

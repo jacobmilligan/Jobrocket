@@ -11,26 +11,53 @@
 
 #include <JobRocket/Scheduler.hpp>
 
-#include <vector>
-#include <thread>
+sky::Scheduler sched;
 
-sky::u32 total = 0;
+uint32_t total = 0;
+static constexpr uint32_t num_jobs = 12;
+static constexpr uint32_t expected = (num_jobs * (num_jobs + 1)) / 2;
 
-void thread_proc(sky::u32 num)
+uint32_t job_results[num_jobs];
+
+bool active = true;
+
+void long_task(uint32_t iteration)
 {
-    total += num;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    total += iteration;
+    if ( iteration >= num_jobs ) {
+        active = false;
+    }
 }
 
 int main(int argc, char** argv)
 {
-    sky::Scheduler sched;
 
     sched.startup(sky::Scheduler::auto_worker_count, sky::Scheduler::default_worker_job_capacity);
 
-    for ( int i = 0; i < 200; ++i ) {
-        auto job = sky::make_job(thread_proc, static_cast<sky::u32>(i));
+    sky::Job job;
+//    for ( int i = 0; i < num_jobs; ++i ) {
+//        job = sky::make_job(thread_proc, num_jobs);
+//        sched.run_job(job);
+//    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    for ( int i = 0; i <= num_jobs; ++i ) {
+        job = sky::make_job(long_task, static_cast<uint32_t>(i));
         sched.run_job(job);
+//        long_task(i);
     }
+    while (active) {
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    auto millis = std::chrono::duration<double, std::milli>(end - start);
+
+    printf("Time: %lf\n", millis.count());
+
+    printf("Expected: %d. Total: %d\n", expected, total);
 
     return 0;
 }

@@ -18,10 +18,10 @@ constexpr size_t num_jobs = 100;
 constexpr size_t num_threads = 3;
 bool completed = false;
 
-double big_calculation(double* values, const sky::u32 value)
+double big_calculation(double* values, const uint32_t value)
 {
     constexpr size_t num_iterations = 100;
-    static std::atomic<sky::u32> iteration(num_jobs);
+    static std::atomic<uint32_t> iteration(num_jobs);
 
     auto result = 0.0;
     values[value] = 0.0;

@@ -12,7 +12,6 @@
 #pragma once
 
 #include "JobRocket/Job.hpp"
-#include "JobRocket/NumericTypes.hpp"
 
 #include <atomic>
 #include <vector>
@@ -33,7 +32,7 @@ public:
     /// @brief Initializes the queue with `capacity` max number of jobs
     /// @param capacity
     explicit StaticWorkStealingQueue(const size_t capacity)
-        : top_(0), bottom_(0), size_(0), capacity_(capacity)
+        : top_(0), bottom_(0), capacity_(capacity)
     {
         jobs_.resize(capacity);
     }
@@ -44,7 +43,6 @@ public:
     StaticWorkStealingQueue(StaticWorkStealingQueue&& other) noexcept
         : jobs_(std::move(other.jobs_)),
           capacity_(other.capacity_),
-          size_(other.size_.load()),
           bottom_(other.bottom_.load()),
           top_(other.top_.load())
     {}
@@ -53,7 +51,6 @@ public:
     {
         jobs_ = std::move(other.jobs_);
         capacity_ = other.capacity_;
-        size_ = other.size_.load();
         bottom_ = other.bottom_.load();
         top_ = other.top_.load();
 
@@ -68,11 +65,6 @@ public:
         auto b = bottom_.load(std::memory_order_relaxed);
         auto t = top_.load(std::memory_order_acquire);
 
-        // Exit early if size already at capacity
-        if ( b - t > capacity_ - 1 ) {
-            return false;
-        }
-
         jobs_[b % capacity_] = job;
 
         std::atomic_thread_fence(std::memory_order_release);
@@ -86,8 +78,7 @@ public:
     bool pop(Job** target)
     {
         // Ensure bottom is decremented first to avoid popping duplicates
-        auto b = bottom_.load(std::memory_order_relaxed) - 1;
-        bottom_.store(b, std::memory_order_relaxed);
+        auto b = bottom_.fetch_sub(1, std::memory_order_relaxed);
         std::atomic_thread_fence(std::memory_order_seq_cst);
 
         auto t = top_.load(std::memory_order_relaxed);
@@ -139,7 +130,7 @@ public:
             *target = &jobs_[t % capacity_];
 
             // Return false if race lost with popping or stealing thread
-            if ( !top_.compare_exchange_weak(t, t + 1, std::memory_order_seq_cst, std::memory_order_relaxed) ) {
+            if ( !top_.compare_exchange_strong(t, t + 1, std::memory_order_seq_cst, std::memory_order_relaxed) ) {
                 result = false;
             }
         }
@@ -159,9 +150,8 @@ public:
     }
 private:
     size_t capacity_{0};
-    std::atomic<u64> size_{0};
-    std::atomic<u64> top_{0};
-    std::atomic<u64> bottom_{0};
+    std::atomic<uint64_t> top_{0};
+    std::atomic<uint64_t> bottom_{0};
 
     std::vector<Job> jobs_;
 };

@@ -31,7 +31,7 @@ public:
 
     Worker() = default;
 
-    Worker(const u32 id, Worker* workers, const u32 num_workers, const u32 max_jobs)
+    Worker(const uint32_t id, Worker* workers, const uint32_t num_workers, const uint32_t max_jobs)
         : active_(false),
           queue_(max_jobs),
           rand_(1, 2),
@@ -112,7 +112,7 @@ public:
         return state_;
     }
 
-    inline u32 id()
+    inline uint32_t id()
     {
         return id_;
     }
@@ -145,8 +145,8 @@ private:
     std::condition_variable cv_;
     std::mutex mutex_;
 
-    u32 id_{0};
-    u32 num_workers_{0};
+    uint32_t id_{0};
+    uint32_t num_workers_{0};
     Worker* workers_{nullptr};
     bool active_{false};
     State state_;
