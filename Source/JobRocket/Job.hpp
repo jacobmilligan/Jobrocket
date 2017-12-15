@@ -12,6 +12,7 @@
 #pragma once
 
 #include "JobRocket/Meta/Apply.hpp"
+#include "JobRocket/AtomicCounter.hpp"
 
 #include <tuple>
 
@@ -51,15 +52,19 @@ struct Job {
         completed
     };
 
+    AtomicCounter* group_counter;
     State state;
-    uint8_t function[64 - sizeof(state)]{};
+
+    static constexpr size_t data_size = sizeof(state) + sizeof(group_counter);
+
+    uint8_t function[64 - data_size]{};
 
     Job()
-        : state(State::unknown)
+        : state(State::unknown), group_counter(nullptr)
     {}
 
     Job(size_t size, void* job_function)
-        : state(State::unknown)
+        : state(State::unknown), group_counter(nullptr)
     {
         memcpy(function, job_function, size);
         state = State::ready;
@@ -70,6 +75,10 @@ struct Job {
         state = State::running;
         reinterpret_cast<JobFunctionBase*>(function)->execute();
         state = State::completed;
+        
+        if ( group_counter != nullptr ) {
+            group_counter->decrement();
+        }
     }
 };
 
