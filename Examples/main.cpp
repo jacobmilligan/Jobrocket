@@ -11,6 +11,24 @@
 
 #include <JobRocket/Scheduler.hpp>
 #include <JobRocket/JobGroup.hpp>
+#include <JobRocket/JobPool.hpp>
+
+struct Timer {
+    double value{0.0};
+
+    void start()
+    {
+        start_time = std::chrono::high_resolution_clock::now();
+    }
+
+    void stop()
+    {
+        auto end = std::chrono::high_resolution_clock::now();
+        value = std::chrono::duration<double, std::milli>(end - start_time).count();
+    }
+private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
+};
 
 sky::Scheduler sched;
 
@@ -30,18 +48,45 @@ void long_task(uint32_t iteration)
 
 int main(int argc, char** argv)
 {
+//    sched.startup(sky::Scheduler::auto_worker_count);
+//
+//    sky::JobGroup group(&sched);
+//
+//    for ( int i = 0; i <= num_jobs; ++i ) {
+//        group.run(long_task, static_cast<uint32_t>(i));
+//    }
+//
+//    group.wait_for_all();
+//
+//    printf("Total: %d. Expected: %d\n", total, expected);
 
-    sched.startup(sky::Scheduler::auto_worker_count, sky::Scheduler::default_worker_job_capacity);
+    constexpr size_t num_objs = 100;
 
-    sky::JobGroup group(&sched);
+    uint32_t* objs[num_objs];
+    uint32_t placement_objs[num_objs];
 
-    for ( int i = 0; i <= num_jobs; ++i ) {
-        group.run(long_task, static_cast<uint32_t>(i));
+    sky::JobPool::init(num_objs + 1);
+
+    Timer timer;
+    timer.start();
+
+    for ( int i = 0; i < num_objs; ++i ) {
+        auto job = sky::make_job(long_task, static_cast<uint32_t>(i));
     }
 
-    group.wait_for_all();
+    timer.stop();
 
-    printf("Total: %d. Expected: %d\n", total, expected);
+    printf("Time: %lf\n", timer.value);
+
+    timer.start();
+
+    for ( int i = 0; i < num_objs; ++i ) {
+        auto job = sky::JobPool::allocate_job(long_task, static_cast<uint32_t>(i));
+    }
+
+    timer.stop();
+
+    printf("Time: %lf\n", timer.value);
 
     return 0;
 }

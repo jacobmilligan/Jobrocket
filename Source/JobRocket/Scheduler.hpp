@@ -19,7 +19,7 @@ namespace sky {
 class Scheduler {
 public:
     static constexpr int32_t auto_worker_count = -1;
-    static constexpr uint32_t default_worker_job_capacity = 4096;
+    static constexpr uint32_t job_capacity_per_worker = 4096;
 
     Scheduler() = default;
 
@@ -27,7 +27,7 @@ public:
 
     uint32_t default_thread_count();
 
-    void startup(int32_t num_threads, uint32_t worker_job_capacity);
+    void startup(int32_t num_threads);
 
     void shutdown();
 

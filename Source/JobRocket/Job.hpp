@@ -13,6 +13,7 @@
 
 #include "JobRocket/Meta/Apply.hpp"
 #include "JobRocket/AtomicCounter.hpp"
+#include "StaticPoolAllocator.hpp"
 
 #include <tuple>
 

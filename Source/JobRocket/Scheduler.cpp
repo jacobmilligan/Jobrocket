@@ -40,7 +40,7 @@ uint32_t Scheduler::default_thread_count()
     return num_cores_;
 }
 
-void Scheduler::startup(const int32_t num_threads, const uint32_t worker_job_capacity)
+void Scheduler::startup(const int32_t num_threads)
 {
     if ( num_threads <= auto_worker_count ) {
         num_workers_ = default_thread_count();
@@ -51,7 +51,7 @@ void Scheduler::startup(const int32_t num_threads, const uint32_t worker_job_cap
     workers_.resize(num_workers_);
     uint32_t worker_id = 0;
     for ( auto& w : workers_ ) {
-        w = std::move(sky::Worker(worker_id++, workers_.data(), num_workers_, worker_job_capacity));
+        w = std::move(sky::Worker(worker_id++, workers_.data(), num_workers_, job_capacity_per_worker));
     }
 
     // Start all worker threads except for worker 0. Worker 0 is reserved for the main thread so
