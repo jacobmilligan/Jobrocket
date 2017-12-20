@@ -25,6 +25,7 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(Deps/glfw-3.2.1)
+add_subdirectory(Deps/fmt-4.0.0 EXCLUDE_FROM_ALL)
 
 find_package(OpenGL REQUIRED)
 
@@ -35,5 +36,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC Tests/catch)
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/Deps/glfw-3.2.1/include)
 target_include_directories(${PROJECT_NAME} PUBLIC ${OPENGL_INCLUDE_DIR})
 
+target_include_directories(${PROJECT_NAME} PUBLIC Deps/fmt-4.0.0)
+
 target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY})
 target_link_libraries(${PROJECT_NAME} glfw ${GLFW_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} fmt::fmt-header-only)

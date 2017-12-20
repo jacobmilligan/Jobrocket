@@ -13,9 +13,10 @@
 
 #include "JobRocket/Meta/Apply.hpp"
 #include "JobRocket/AtomicCounter.hpp"
-#include "StaticPoolAllocator.hpp"
+#include "FixedPoolAllocator.hpp"
 
 #include <tuple>
+#include <thread>
 
 namespace sky {
 
@@ -53,19 +54,26 @@ struct Job {
         completed
     };
 
-    AtomicCounter* group_counter;
     State state;
+    AtomicCounter* group_counter;
+    uint32_t worker_alloc;
 
-    static constexpr size_t data_size = sizeof(state) + sizeof(group_counter);
+    static constexpr size_t data_size = sizeof(state) +
+                                        sizeof(group_counter) +
+                                        sizeof(worker_alloc);
 
     uint8_t function[64 - data_size]{};
 
     Job()
-        : state(State::unknown), group_counter(nullptr)
+        : state(State::unknown),
+          group_counter(nullptr),
+          worker_alloc(0)
     {}
 
-    Job(size_t size, void* job_function)
-        : state(State::unknown), group_counter(nullptr)
+    Job(const size_t size, void* job_function, const uint32_t allocating_worker)
+        : state(State::unknown),
+          group_counter(nullptr),
+          worker_alloc(allocating_worker)
     {
         memcpy(function, job_function, size);
         state = State::ready;
@@ -88,7 +96,7 @@ template <typename Fn, typename... Args>
 Job make_job(Fn function, Args&&... args)
 {
     auto data = JobFunction<Fn, Args...>(function, std::forward<Args>(args)...);
-    return Job(data.size(), &data);
+    return Job(data.size(), &data, 0);
 }
 
 

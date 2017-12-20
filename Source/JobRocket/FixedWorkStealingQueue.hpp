@@ -1,5 +1,5 @@
 //
-//  StaticWorkStealingQueue.hpp
+//  FixedWorkStealingQueue.hpp
 //  JobRocket
 //
 //  --------------------------------------------------------------
@@ -25,29 +25,29 @@
 
 namespace sky {
 
-class StaticWorkStealingQueue {
+class FixedWorkStealingQueue {
 public:
-    StaticWorkStealingQueue() = default;
+    FixedWorkStealingQueue() = default;
 
     /// @brief Initializes the queue with `capacity` max number of jobs
     /// @param capacity
-    explicit StaticWorkStealingQueue(const size_t capacity)
+    explicit FixedWorkStealingQueue(const size_t capacity)
         : top_(0), bottom_(0), capacity_(capacity)
     {
         jobs_.resize(capacity);
     }
 
-    StaticWorkStealingQueue(const StaticWorkStealingQueue& other) = delete;
-    StaticWorkStealingQueue& operator=(const StaticWorkStealingQueue& other) = delete;
+    FixedWorkStealingQueue(const FixedWorkStealingQueue& other) = delete;
+    FixedWorkStealingQueue& operator=(const FixedWorkStealingQueue& other) = delete;
 
-    StaticWorkStealingQueue(StaticWorkStealingQueue&& other) noexcept
+    FixedWorkStealingQueue(FixedWorkStealingQueue&& other) noexcept
         : jobs_(std::move(other.jobs_)),
           capacity_(other.capacity_),
           bottom_(other.bottom_.load()),
           top_(other.top_.load())
     {}
 
-    StaticWorkStealingQueue& operator=(StaticWorkStealingQueue&& other) noexcept
+    FixedWorkStealingQueue& operator=(FixedWorkStealingQueue&& other) noexcept
     {
         jobs_ = std::move(other.jobs_);
         capacity_ = other.capacity_;
@@ -60,7 +60,7 @@ public:
     /// @brief Pushes a new job onto the bottom of the queue - must be called from owning thread
     /// @param job
     /// @return True if successful push, false otherwise
-    bool push(const Job& job)
+    bool push(Job* job)
     {
         auto b = bottom_.load(std::memory_order_relaxed);
         auto t = top_.load(std::memory_order_acquire);
@@ -88,7 +88,7 @@ public:
         // Check for non-empty queue
         if ( t <= b ) {
             result = true;
-            *target = &jobs_[b % capacity_];
+            *target = jobs_[b % capacity_];
             // Check if this is the last element in queue
             if ( t == b ) {
                 // Return false if race lost with stealing thread
@@ -127,7 +127,7 @@ public:
         // Check if queue is non-empty
         if ( t < b ) {
             result = true;
-            *target = &jobs_[t % capacity_];
+            *target = jobs_[t % capacity_];
 
             // Return false if race lost with popping or stealing thread
             if ( !top_.compare_exchange_strong(t, t + 1, std::memory_order_seq_cst, std::memory_order_relaxed) ) {
@@ -153,7 +153,7 @@ private:
     std::atomic<uint64_t> top_{0};
     std::atomic<uint64_t> bottom_{0};
 
-    std::vector<Job> jobs_;
+    std::vector<Job*> jobs_;
 };
 
 

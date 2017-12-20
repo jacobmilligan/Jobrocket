@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "JobRocket/StaticWorkStealingQueue.hpp"
+#include "JobRocket/FixedWorkStealingQueue.hpp"
 #include "JobRocket/RNG.hpp"
 
 #include <thread>
@@ -97,13 +97,14 @@ public:
         state_ = State::terminated;
     }
 
-    void schedule_job(const Job& job)
+    void schedule_job(Job* job)
     {
         queue_.push(job);
     }
 
     bool owns_this_thread()
     {
+        auto hash = std::hash<std::thread::id>();
         return thread_.get_id() == std::this_thread::get_id();
     }
 
@@ -139,7 +140,7 @@ public:
 
 private:
     std::thread thread_;
-    StaticWorkStealingQueue queue_;
+    FixedWorkStealingQueue queue_;
     xoroshiro128 rand_{1, 2};
 
     std::condition_variable cv_;

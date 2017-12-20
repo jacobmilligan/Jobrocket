@@ -9,7 +9,7 @@
 //  Copyright (c) 2016 Jacob Milligan. All rights reserved.
 //
 
-#include <JobRocket/StaticWorkStealingQueue.hpp>
+#include <JobRocket/FixedWorkStealingQueue.hpp>
 #include <random>
 #include <thread>
 
@@ -47,7 +47,7 @@ double big_calculation(const uint32_t value)
     return result;
 }
 
-void parallel_for(std::atomic_uint* job_count, std::thread* threads, sky::StaticWorkStealingQueue* queues,
+void parallel_for(std::atomic_uint* job_count, std::thread* threads, sky::FixedWorkStealingQueue* queues,
                   std::atomic_bool* active, const int value)
 {
     if ( value > 0 ) {
@@ -76,7 +76,7 @@ void queue_example()
 {
     std::atomic_bool active(false);
     std::thread threads[num_threads];
-    std::vector<sky::StaticWorkStealingQueue> queues;
+    std::vector<sky::FixedWorkStealingQueue> queues;
 
     std::atomic_uint job_count(num_jobs);
 

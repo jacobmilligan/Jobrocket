@@ -31,7 +31,7 @@ public:
 
     void shutdown();
 
-    void run_job(Job& job);
+    void run_job(Job* job);
 
     void wait(Job& job);
 

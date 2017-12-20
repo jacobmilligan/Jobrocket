@@ -10,7 +10,7 @@
 //
 
 #include "catch/catch.hpp"
-#include <JobRocket/StaticWorkStealingQueue.hpp>
+#include <JobRocket/FixedWorkStealingQueue.hpp>
 
 #include <thread>
 #include <random>
@@ -54,7 +54,7 @@ public:
     static constexpr size_t num_jobs = 100;
     static constexpr size_t num_threads = 4;
 
-    std::vector<sky::StaticWorkStealingQueue> queues;
+    std::vector<sky::FixedWorkStealingQueue> queues;
     std::atomic_uint job_count{num_jobs};
 private:
     std::atomic_bool active_{false};

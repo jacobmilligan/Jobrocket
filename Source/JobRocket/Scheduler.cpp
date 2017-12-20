@@ -89,7 +89,7 @@ Worker* Scheduler::thread_local_worker()
     return local_worker;
 }
 
-void Scheduler::run_job(Job& job)
+void Scheduler::run_job(Job* job)
 {
     thread_local_worker()->schedule_job(job);
 }

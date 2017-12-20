@@ -23,3 +23,5 @@ endfunction()
 
 add_test(TestQueue TestQueue.cpp)
 add_test(TestWorkers TestWorker.cpp)
+add_test(TestPoolAllocator TestPoolAllocator.cpp)
+add_test(TestJobPool TestJobPool.cpp)
