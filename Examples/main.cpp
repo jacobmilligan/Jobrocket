@@ -84,25 +84,25 @@ void profile_job_allocator()
 
 int main(int argc, char** argv)
 {
-    sched.startup(sky::Scheduler::auto_worker_count);
-
-    sky::JobGroup group(&sched);
-
-    for ( int i = 0; i <= num_jobs; ++i ) {
-        group.run(long_task, static_cast<uint32_t>(i));
-    }
-
-    group.wait_for_all();
-
-    printf("Total: %d. Expected: %d\n", total, expected);
-
-//    for ( int i = 0; i < 3; ++i ) {
-//        profile_job_allocator();
+//    sched.startup(sky::Scheduler::auto_worker_count);
+//
+//    sky::JobGroup group(&sched);
+//
+//    for ( int i = 0; i <= num_jobs; ++i ) {
+//        group.run(long_task, static_cast<uint32_t>(i));
 //    }
 //
-//    fmt::print("Real one\n");
+//    group.wait_for_all();
 //
-//    profile_job_allocator();
+//    printf("Total: %d. Expected: %d\n", total, expected);
+
+    for ( int i = 0; i < 3; ++i ) {
+        profile_job_allocator();
+    }
+
+    fmt::print("Real one\n");
+
+    profile_job_allocator();
 
 
     return 0;
