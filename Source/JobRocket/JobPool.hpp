@@ -43,12 +43,15 @@ public:
             free_all_this_thread();
         }
 
-        void* mem = allocators_[index].allocate();
-        auto fn =  JobFunction<Fn, Args...>(function, std::forward<Args>(args)...);
+        auto* job = static_cast<Job*>(allocators_[index].allocate());
 
-        new (mem) Job(fn.size(), &fn, index);
+        new (job->function) JobFunction<Fn, Args...>(function, std::forward<Args>(args)...);
 
-        return static_cast<Job*>(mem);
+        job->worker_alloc = index;
+        job->state = Job::State::ready;
+        job->group_counter = nullptr;
+
+        return job;
     }
 
     void free_all_this_thread()
@@ -59,7 +62,7 @@ public:
         }
     }
 
-    void free_job(Job* job)
+    void free_job(Job*& job)
     {
         free_lists_[job->worker_alloc].push(job);
     }
@@ -79,23 +82,22 @@ private:
         explicit FreeList(const size_t capacity)
             : next_(0), capacity_(capacity)
         {
-            elements.resize(capacity_, nullptr);
+            elements_.resize(capacity_, nullptr);
         }
 
         void reset()
         {
             next_ = 0;
-            for ( auto& e : elements ) {
+            for ( auto& e : elements_ ) {
                 e = nullptr;
             }
 
             std::atomic_thread_fence(std::memory_order_seq_cst);
         }
 
-        void push(Job* job)
+        void push(Job*& job)
         {
-            auto n = next_++;
-            elements[n] = job;
+            elements_[next_++] = job;
         }
 
         Job* pop()
@@ -105,7 +107,7 @@ private:
             }
             auto n = --next_;
 
-            auto* job = elements[n];
+            auto* job = elements_[n];
             return job;
         }
 
@@ -120,8 +122,8 @@ private:
         }
     private:
         size_t next_{0};
-        size_t capacity_;
-        std::vector<Job*> elements;
+        size_t capacity_{0};
+        std::vector<Job*> elements_;
     };
 
     uint32_t num_threads_;

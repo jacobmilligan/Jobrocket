@@ -41,6 +41,7 @@ double big_calculation(double* values, const uint32_t value)
 TEST_CASE("Workers perform as expected", "[worker]")
 {
     double values[num_jobs];
+    sky::Job jobs[num_jobs];
     std::vector<sky::Worker> workers;
 
     workers.resize(num_threads);
@@ -50,8 +51,8 @@ TEST_CASE("Workers perform as expected", "[worker]")
     }
 
     for ( int i = 0; i < num_jobs; ++i ) {
-        auto job = sky::make_job(big_calculation, values, static_cast<uint32_t>(i));
-        workers[i % num_threads].schedule_job(job);
+        jobs[i] = sky::make_job(big_calculation, values, static_cast<uint32_t>(i));
+        workers[i % num_threads].schedule_job(&jobs[i]);
     }
 
     for ( auto& w : workers ) {

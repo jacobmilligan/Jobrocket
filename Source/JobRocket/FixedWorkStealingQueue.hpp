@@ -75,10 +75,10 @@ public:
     /// @brief Pops the next job from the bottom of the queue - must be called from owning thread
     /// @param target
     /// @return True if popped successfully, false otherwise
-    bool pop(Job** target)
+    bool pop(Job*& target)
     {
         // Ensure bottom is decremented first to avoid popping duplicates
-        auto b = bottom_.fetch_sub(1, std::memory_order_relaxed);
+        auto b = --bottom_;
         std::atomic_thread_fence(std::memory_order_seq_cst);
 
         auto t = top_.load(std::memory_order_relaxed);
@@ -88,7 +88,7 @@ public:
         // Check for non-empty queue
         if ( t <= b ) {
             result = true;
-            *target = jobs_[b % capacity_];
+            target = jobs_[b % capacity_];
             // Check if this is the last element in queue
             if ( t == b ) {
                 // Return false if race lost with stealing thread
@@ -110,7 +110,7 @@ public:
     /// @brief Steals a job from the top of the queue - can be called from any thread
     /// @param target
     /// @return True if successful steal, false otherwise
-    bool steal(Job** target)
+    bool steal(Job*& target)
     {
         // Ensure top is read first
         auto t = top_.load(std::memory_order_acquire);
@@ -127,7 +127,7 @@ public:
         // Check if queue is non-empty
         if ( t < b ) {
             result = true;
-            *target = jobs_[t % capacity_];
+            target = jobs_[t % capacity_];
 
             // Return false if race lost with popping or stealing thread
             if ( !top_.compare_exchange_strong(t, t + 1, std::memory_order_seq_cst, std::memory_order_relaxed) ) {

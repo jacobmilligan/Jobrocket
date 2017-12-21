@@ -122,14 +122,14 @@ public:
     {
         Job* next_job = nullptr;
 
-        auto pop_success = queue_.pop(&next_job);
+        auto pop_success = queue_.pop(next_job);
         if ( pop_success && next_job->state == sky::Job::State::ready ) {
             return next_job;
         }
 
         auto rand_worker = rand_.next() % num_workers_;
         if ( rand_worker != id_ ) {
-            auto steal_success = workers_[rand_worker].queue_.steal(&next_job);
+            auto steal_success = workers_[rand_worker].queue_.steal(next_job);
             if ( steal_success && next_job->state == sky::Job::State::ready ) {
                 return next_job;
             }

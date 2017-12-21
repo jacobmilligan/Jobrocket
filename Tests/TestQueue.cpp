@@ -82,14 +82,14 @@ private:
     {
         sky::Job* job = nullptr;
         while ( active_.load() ) {
-            auto pop_success = queues[index].pop(&job);
+            auto pop_success = queues[index].pop(job);
             if ( pop_success && job->state == sky::Job::State::ready ) {
                 job->execute();
                 --job_count;
             } else {
                 auto rand_worker = random_index() % num_threads;
                 if ( rand_worker != index ) {
-                    auto steal_success = queues[rand_worker].steal(&job);
+                    auto steal_success = queues[rand_worker].steal(job);
                     if ( steal_success && job->state == sky::Job::State::ready ) {
                         job->execute();
                         --job_count;
@@ -123,10 +123,11 @@ double big_calculation(double* values, const uint32_t value)
 TEST_CASE_METHOD(QueueTestFixture, "Queue works for basic numeric operations", "[queue]")
 {
     double values[num_jobs];
+    sky::Job jobs[num_jobs];
 
     for ( int i = 0; i < num_jobs; ++i ) {
-        auto job = sky::make_job(big_calculation, values, static_cast<uint32_t>(i));
-        queues[i % num_threads].push(job);
+        jobs[i] = sky::make_job(big_calculation, values, static_cast<uint32_t>(i));
+        queues[i % num_threads].push(&jobs[i]);
     }
 
     start();
