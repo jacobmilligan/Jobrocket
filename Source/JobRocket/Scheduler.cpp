@@ -21,7 +21,7 @@ Scheduler::~Scheduler()
     shutdown();
 }
 
-uint32_t Scheduler::default_thread_count()
+uint32_t Scheduler::auto_worker_count_value()
 {
     if ( num_cores_ == 0 || num_hw_threads_ == 0 ) {
         hwloc_topology_t topology;
@@ -43,7 +43,7 @@ uint32_t Scheduler::default_thread_count()
 void Scheduler::startup(const int32_t num_threads)
 {
     if ( num_threads <= auto_worker_count ) {
-        num_workers_ = default_thread_count();
+        num_workers_ = auto_worker_count_value();
     } else {
         num_workers_ = static_cast<uint32_t>(num_threads);
     }
@@ -89,7 +89,7 @@ Worker* Scheduler::thread_local_worker()
     return local_worker;
 }
 
-void Scheduler::run_job(Job* job)
+void Scheduler::schedule_job(Job* job)
 {
     thread_local_worker()->schedule_job(job);
 }

@@ -33,7 +33,7 @@ public:
         auto job = make_job(function, std::forward<Args>(args)...);
         job->group_counter = &job_count_;
 
-        current_scheduler()->run_job(job);
+        current_scheduler()->schedule_job(job);
     }
 
     void wait_for_all()

@@ -23,9 +23,9 @@ struct JobRocket {
 Scheduler JobRocket::scheduler;
 JobPool JobRocket::job_pool;
 
-void startup(int32_t num_threads)
+void startup(int32_t num_workers)
 {
-    JobRocket::scheduler.startup(num_threads);
+    JobRocket::scheduler.startup(num_workers);
     JobRocket::job_pool = JobPool(JobRocket::scheduler.num_workers(), JobRocket::pool_capacity);
 }
 
@@ -47,7 +47,7 @@ Scheduler* current_scheduler()
 
 void run(Job* job)
 {
-    JobRocket::scheduler.run_job(job);
+    JobRocket::scheduler.schedule_job(job);
 }
 
 void wait(const Job* job)
