@@ -10,7 +10,6 @@
 //
 
 #include "JobRocket/JobRocket.hpp"
-#include "JobRocket/Scheduler.hpp"
 
 namespace jobrocket {
 
@@ -44,6 +43,17 @@ JobPool* current_job_pool()
 Scheduler* current_scheduler()
 {
     return &JobRocket::scheduler;
+}
+
+void wait(const Job* job)
+{
+    Job* next_job = nullptr;
+    while ( job->state != Job::State::completed ) {
+        next_job = JobRocket::scheduler.thread_local_worker()->get_next_job();
+        if ( next_job != nullptr ) {
+            next_job->execute();
+        }
+    }
 }
 
 

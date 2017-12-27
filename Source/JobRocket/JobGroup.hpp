@@ -13,15 +13,15 @@
 
 #include <atomic>
 #include "JobRocket/Detail/AtomicCounter.hpp"
-#include "JobRocket/Scheduler.hpp"
+#include "JobRocket/JobRocket.hpp"
 
 namespace jobrocket {
 
 
 class JobGroup {
 public:
-    explicit JobGroup(Scheduler* scheduler)
-        : job_count_(0), scheduler_(scheduler)
+    JobGroup()
+        : job_count_(0)
     {}
 
     template <typename Fn, typename... Args>
@@ -29,17 +29,17 @@ public:
     {
         job_count_.increment();
 
-        auto job = make_unmanaged_job(function, std::forward<Args...>(args)...);
-        job.group_counter = &job_count_;
+        auto job = make_job(function, std::forward<Args>(args)...);
+        job->group_counter = &job_count_;
 
-        scheduler_->run_job(job);
+        current_scheduler()->run_job(job);
     }
 
     void wait_for_all()
     {
         Job* next_job = nullptr;
         while ( job_count_.load() > 0 ) {
-            next_job = scheduler_->thread_local_worker()->get_next_job();
+            next_job = current_scheduler()->thread_local_worker()->get_next_job();
             if ( next_job != nullptr ) {
                 next_job->execute();
             }
@@ -47,7 +47,6 @@ public:
     }
 private:
     AtomicCounter job_count_;
-    Scheduler* scheduler_;
 };
 
 

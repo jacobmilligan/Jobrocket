@@ -12,14 +12,15 @@
 #pragma once
 
 
-#include <cstdint>
 #include "JobRocket/JobPool.hpp"
+#include "JobRocket/Scheduler.hpp"
+
+#include <cstdint>
 
 namespace jobrocket {
 
-class Scheduler;
 
-void startup(int32_t num_threads = -1);
+void startup(int32_t num_threads = Scheduler::auto_worker_count);
 
 void shutdown();
 
@@ -33,7 +34,15 @@ static Job* make_job(Fn function, Args&& ... args)
     return current_job_pool()->allocate_job(function, std::forward<Args>(args)...);
 };
 
+void wait(const Job* job);
 
+template <typename Fn, typename... Args>
+static void make_job_and_wait(Fn function, Args&& ... args)
+{
+    auto* job = make_job(function, std::forward<Args>(args)...);
+    current_scheduler()->run_job(job);
+    wait(job);
+};
 
 
 }

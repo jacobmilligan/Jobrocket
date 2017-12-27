@@ -10,7 +10,7 @@
 //
 
 #include <JobRocket/JobRocket.hpp>
-#include <JobRocket/Scheduler.hpp>
+#include <JobRocket/JobGroup.hpp>
 
 struct Timer {
     double value{0.0};
@@ -48,21 +48,47 @@ void no_op_job()
     // no op
 }
 
-void print_job(const char* msg, const uint32_t num_workers)
+static uint32_t countdown = (num_jobs * num_jobs) + num_jobs;
+
+void subjob(const uint32_t parent, const uint32_t job_num)
 {
-    fmt::print("Message: {0}\nNum workers: {1}", msg, num_workers);
+    fmt::print("\tParent: {0} | Subtask: {1}\n", parent, job_num);
+    --countdown;
+}
+
+void print_job(const char* msg, const uint32_t index)
+{
+    fmt::print("Message: '{0}'  | Index: {1}\n", msg, index);
+    jobrocket::JobGroup group;
+
+    for ( int i = 0; i < num_jobs; ++i ) {
+        group.run(subjob, index, uint32_t(i));
+    }
+
+    group.wait_for_all();
+    --countdown;
 }
 
 int main(int argc, char** argv)
 {
-
     jobrocket::startup();
 
-    auto* job = jobrocket::make_job(print_job, "Hey", jobrocket::current_scheduler()->num_workers());
-    job->execute();
+    fmt::print("Start ({0} workers): {1}\n", jobrocket::current_scheduler()->num_workers(), countdown);
+
+    jobrocket::JobGroup group;
+    for ( int i = 0; i < num_jobs; ++i ) {
+        group.run(print_job, "Hey", uint32_t(i));
+    }
+
+    group.wait_for_all();
+
+    fmt::print("Finish: {0}\n", countdown);
+
+    jobrocket::make_job_and_wait(print_job, "Single job wait", 0);
+
+    fmt::print("Done job\n");
 
     jobrocket::shutdown();
-
 
     return 0;
 }

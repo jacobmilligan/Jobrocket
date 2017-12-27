@@ -94,15 +94,5 @@ void Scheduler::run_job(Job* job)
     thread_local_worker()->schedule_job(job);
 }
 
-void Scheduler::wait(Job& job)
-{
-    Job* next_job = nullptr;
-    while ( job.state != Job::State::completed ) {
-        next_job = thread_local_worker()->get_next_job();
-        if ( next_job != nullptr ) {
-            next_job->execute();
-        }
-    }
-}
 
 }

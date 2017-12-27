@@ -33,8 +33,6 @@ public:
 
     void run_job(Job* job);
 
-    void wait(Job& job);
-
     Worker* thread_local_worker();
 
     inline uint32_t core_count()
