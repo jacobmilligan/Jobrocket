@@ -140,8 +140,8 @@ public:
 
 private:
     std::thread thread_;
-    FixedWorkStealingQueue queue_;
-    xoroshiro128 rand_{1, 2};
+    detail::FixedWorkStealingQueue queue_;
+    detail::xoroshiro128 rand_{1, 2};
 
     std::condition_variable cv_;
     std::mutex mutex_;

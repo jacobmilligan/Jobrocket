@@ -15,6 +15,7 @@
 #include <atomic>
 
 namespace jobrocket {
+namespace detail {
 
 
 class AtomicCounter {
@@ -46,9 +47,11 @@ public:
     {
         ++counter_;
     }
+
 private:
     std::atomic_uint counter_{0};
 };
 
 
-}
+} // namespace detail
+} // namespace jobrocket

@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "JobRocket/Meta/IndexSequence.hpp"
-#include "JobRocket/Meta/Invoke.hpp"
+#include "IndexSequence.hpp"
+#include "Invoke.hpp"
 
 #include <cstddef>
 #include <utility>

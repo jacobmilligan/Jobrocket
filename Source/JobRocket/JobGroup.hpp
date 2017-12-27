@@ -11,9 +11,10 @@
 
 #pragma once
 
-#include <atomic>
 #include "JobRocket/Detail/AtomicCounter.hpp"
 #include "JobRocket/JobRocket.hpp"
+
+#include <atomic>
 
 namespace jobrocket {
 
@@ -46,7 +47,7 @@ public:
         }
     }
 private:
-    AtomicCounter job_count_;
+    detail::AtomicCounter job_count_;
 };
 
 

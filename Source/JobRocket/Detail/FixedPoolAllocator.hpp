@@ -11,16 +11,17 @@
 
 #pragma once
 
+#include "JobRocket/Detail/Error.hpp"
+
 #include <cstdint>
 #include <cstddef>
 #include <cassert>
 #include <cstdio>
 #include <cstring>
 
-#include <fmt/format.h>
-
-
 namespace jobrocket {
+namespace detail {
+
 
 // TODO(Jacob): Implement alignment
 class FixedPoolAllocator {
@@ -87,18 +88,20 @@ public:
     bool free(void* data)
     {
         if ( data == nullptr ) {
-            print_error("tried to free a null pointer");
+            print_error("FixedPoolAllocator", "tried to free a null pointer");
             return false;
         }
 
         if ( blocks_initialized_ <= 0 ) {
-            print_error("tried to free more blocks than the pool has available",
+            print_error("FixedPoolAllocator",
+                        "tried to free more blocks than the pool has available",
                         "ensure all allocations/frees are in matching pairs");
             return false;
         }
 
         if ( data > &memory_[block_size_ * max_blocks_] || data < &memory_[0] ) {
-            print_error("attempted to free memory that wasn't allocated by the pool",
+            print_error("FixedPoolAllocator",
+                        "attempted to free memory that wasn't allocated by the pool",
                         "consider tracking all allocations to ensure they come from the same pool");
             return false;
         }
@@ -130,22 +133,8 @@ private:
     size_t max_blocks_{0};
 
     uint32_t blocks_initialized_{0};
-
-    void print_error(const char* what)
-    {
-        static const char* prog = "FixedPoolAllocator";
-        fmt::print(stderr, "{0} error: {1}\n", prog, what);
-    }
-
-    void print_error(const char* what, const char* help)
-    {
-        static const char* prog = "FixedPoolAllocator";
-        static const char* arrow = "->";
-        static auto len = static_cast<int>(strlen(prog) - strlen(arrow) + 2);
-
-        fmt::print(stderr, "{0} error: {1}\n{2:>{3}} help: {4}\n", prog, what, arrow, len, help);
-    }
 };
 
 
+}
 }

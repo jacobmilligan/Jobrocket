@@ -24,6 +24,8 @@
 //
 
 namespace jobrocket {
+namespace detail {
+
 
 class FixedWorkStealingQueue {
 public:
@@ -32,7 +34,8 @@ public:
     /// @brief Initializes the queue with `capacity` max number of jobs
     /// @param capacity
     explicit FixedWorkStealingQueue(const size_t capacity)
-        : top_(0), bottom_(0), capacity_(capacity)
+        :
+        top_(0), bottom_(0), capacity_(capacity)
     {
         jobs_.resize(capacity);
     }
@@ -41,10 +44,11 @@ public:
     FixedWorkStealingQueue& operator=(const FixedWorkStealingQueue& other) = delete;
 
     FixedWorkStealingQueue(FixedWorkStealingQueue&& other) noexcept
-        : jobs_(std::move(other.jobs_)),
-          capacity_(other.capacity_),
-          bottom_(other.bottom_.load()),
-          top_(other.top_.load())
+        :
+        jobs_(std::move(other.jobs_)),
+        capacity_(other.capacity_),
+        bottom_(other.bottom_.load()),
+        top_(other.top_.load())
     {}
 
     FixedWorkStealingQueue& operator=(FixedWorkStealingQueue&& other) noexcept
@@ -92,7 +96,8 @@ public:
             // Check if this is the last element in queue
             if ( t == b ) {
                 // Return false if race lost with stealing thread
-                if ( !top_.compare_exchange_strong(t, t + 1, std::memory_order_seq_cst, std::memory_order_relaxed) ) {
+                if ( !top_.compare_exchange_strong(t, t + 1, std::memory_order_seq_cst,
+                                                   std::memory_order_relaxed) ) {
                     result = false;
                 }
 
@@ -130,7 +135,8 @@ public:
             target = jobs_[t % capacity_];
 
             // Return false if race lost with popping or stealing thread
-            if ( !top_.compare_exchange_strong(t, t + 1, std::memory_order_seq_cst, std::memory_order_relaxed) ) {
+            if ( !top_.compare_exchange_strong(t, t + 1, std::memory_order_seq_cst,
+                                               std::memory_order_relaxed) ) {
                 result = false;
             }
         }
@@ -148,6 +154,7 @@ public:
         auto t = top_.load(std::memory_order_relaxed);
         return b <= t;
     }
+
 private:
     size_t capacity_{0};
     std::atomic<uint64_t> top_{0};
@@ -157,4 +164,5 @@ private:
 };
 
 
-}
+} // namespace detail
+} // namespace jobrocket

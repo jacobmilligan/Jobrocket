@@ -12,6 +12,8 @@
 #include <JobRocket/JobRocket.hpp>
 #include <JobRocket/JobGroup.hpp>
 
+#include <fmt/format.h>
+
 struct Timer {
     double value{0.0};
 

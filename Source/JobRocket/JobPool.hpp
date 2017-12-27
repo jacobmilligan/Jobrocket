@@ -12,8 +12,10 @@
 #pragma once
 
 #include "JobRocket/Job.hpp"
+#include "JobRocket/Detail/FixedPoolAllocator.hpp"
 
 #include <cstdint>
+#include <vector>
 
 namespace jobrocket {
 
@@ -33,7 +35,7 @@ public:
         }
 
         for ( auto& a : allocators_ ) {
-            a = std::move(FixedPoolAllocator(sizeof(Job), capacity));
+            a = std::move(detail::FixedPoolAllocator(sizeof(Job), capacity));
         }
     }
 
@@ -129,7 +131,7 @@ private:
     };
 
     uint32_t num_threads_{0};
-    std::vector<FixedPoolAllocator> allocators_;
+    std::vector<detail::FixedPoolAllocator> allocators_;
     std::vector<FreeList> free_lists_;
 
     uint32_t next_index{0};

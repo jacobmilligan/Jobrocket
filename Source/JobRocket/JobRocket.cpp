@@ -62,4 +62,4 @@ void wait(const Job* job)
 }
 
 
-}
+} // namespace jobrocket

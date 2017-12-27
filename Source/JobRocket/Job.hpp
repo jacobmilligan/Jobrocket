@@ -11,9 +11,8 @@
 
 #pragma once
 
-#include "JobRocket/Meta/Apply.hpp"
+#include "JobRocket/Detail/Apply.hpp"
 #include "JobRocket/Detail/AtomicCounter.hpp"
-#include "JobRocket/Detail/FixedPoolAllocator.hpp"
 
 #include <tuple>
 #include <thread>
@@ -55,7 +54,7 @@ struct Job {
     };
 
     State state;
-    AtomicCounter* group_counter;
+    detail::AtomicCounter* group_counter;
     uint32_t worker_alloc;
 
     static constexpr size_t data_size = sizeof(state) +
