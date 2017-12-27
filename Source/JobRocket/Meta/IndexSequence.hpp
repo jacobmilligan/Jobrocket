@@ -13,7 +13,7 @@
 
 #include <cstddef>
 
-namespace sky {
+namespace jobrocket {
 
 // Based on: https://stackoverflow.com/questions/17424477/implementation-c14-make-integer-sequence
 

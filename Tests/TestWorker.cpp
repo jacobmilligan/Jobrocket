@@ -41,17 +41,17 @@ double big_calculation(double* values, const uint32_t value)
 TEST_CASE("Workers perform as expected", "[worker]")
 {
     double values[num_jobs];
-    sky::Job jobs[num_jobs];
-    std::vector<sky::Worker> workers;
+    jobrocket::Job jobs[num_jobs];
+    std::vector<jobrocket::Worker> workers;
 
     workers.resize(num_threads);
 
     for ( auto& w : workers ) {
-        w = std::move(sky::Worker(0, workers.data(), num_threads, num_jobs));
+        w = std::move(jobrocket::Worker(0, workers.data(), num_threads, num_jobs));
     }
 
     for ( int i = 0; i < num_jobs; ++i ) {
-        jobs[i] = sky::make_job(big_calculation, values, static_cast<uint32_t>(i));
+        jobs[i] = jobrocket::make_unmanaged_job(big_calculation, values, static_cast<uint32_t>(i));
         workers[i % num_threads].schedule_job(&jobs[i]);
     }
 

@@ -20,7 +20,7 @@
 #include <fmt/format.h>
 
 
-namespace sky {
+namespace jobrocket {
 
 // TODO(Jacob): Implement alignment
 class FixedPoolAllocator {

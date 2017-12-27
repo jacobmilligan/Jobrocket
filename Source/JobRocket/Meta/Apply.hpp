@@ -17,7 +17,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace sky {
+namespace jobrocket {
 namespace detail {
 
 
@@ -44,4 +44,4 @@ constexpr decltype(auto) apply(Fn&& function, Tuple&& tuple)
 }
 
 
-} // namespace sky
+} // namespace jobrocket

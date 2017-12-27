@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <functional>
 
-namespace sky {
+namespace jobrocket {
 
 // Based on: https://stackoverflow.com/questions/38288042/c11-14-invoke-workaround
 

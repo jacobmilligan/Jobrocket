@@ -10,7 +10,7 @@
 //
 
 #include "catch/catch.hpp"
-#include <JobRocket/FixedWorkStealingQueue.hpp>
+#include <JobRocket/Detail/FixedWorkStealingQueue.hpp>
 
 #include <thread>
 #include <random>
@@ -54,7 +54,7 @@ public:
     static constexpr size_t num_jobs = 100;
     static constexpr size_t num_threads = 4;
 
-    std::vector<sky::FixedWorkStealingQueue> queues;
+    std::vector<jobrocket::FixedWorkStealingQueue> queues;
     std::atomic_uint job_count{num_jobs};
 private:
     std::atomic_bool active_{false};
@@ -80,17 +80,17 @@ private:
 
     void thread_proc(const uint32_t index)
     {
-        sky::Job* job = nullptr;
+        jobrocket::Job* job = nullptr;
         while ( active_.load() ) {
             auto pop_success = queues[index].pop(job);
-            if ( pop_success && job->state == sky::Job::State::ready ) {
+            if ( pop_success && job->state == jobrocket::Job::State::ready ) {
                 job->execute();
                 --job_count;
             } else {
                 auto rand_worker = random_index() % num_threads;
                 if ( rand_worker != index ) {
                     auto steal_success = queues[rand_worker].steal(job);
-                    if ( steal_success && job->state == sky::Job::State::ready ) {
+                    if ( steal_success && job->state == jobrocket::Job::State::ready ) {
                         job->execute();
                         --job_count;
                     }
@@ -123,10 +123,10 @@ double big_calculation(double* values, const uint32_t value)
 TEST_CASE_METHOD(QueueTestFixture, "Queue works for basic numeric operations", "[queue]")
 {
     double values[num_jobs];
-    sky::Job jobs[num_jobs];
+    jobrocket::Job jobs[num_jobs];
 
     for ( int i = 0; i < num_jobs; ++i ) {
-        jobs[i] = sky::make_job(big_calculation, values, static_cast<uint32_t>(i));
+        jobs[i] = jobrocket::make_unmanaged_job(big_calculation, values, static_cast<uint32_t>(i));
         queues[i % num_threads].push(&jobs[i]);
     }
 

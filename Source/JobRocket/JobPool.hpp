@@ -15,11 +15,13 @@
 
 #include <cstdint>
 
-namespace sky {
+namespace jobrocket {
 
 
 class JobPool {
 public:
+    JobPool() = default;
+
     JobPool(const uint32_t num_threads, const uint32_t capacity)
     {
         num_threads_ = num_threads;
@@ -126,7 +128,7 @@ private:
         std::vector<Job*> elements_;
     };
 
-    uint32_t num_threads_;
+    uint32_t num_threads_{0};
     std::vector<FixedPoolAllocator> allocators_;
     std::vector<FreeList> free_lists_;
 

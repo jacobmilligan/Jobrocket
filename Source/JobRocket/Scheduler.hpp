@@ -13,7 +13,7 @@
 
 #include "JobRocket/Worker.hpp"
 
-namespace sky {
+namespace jobrocket {
 
 
 class Scheduler {
@@ -45,6 +45,11 @@ public:
     inline uint32_t hardware_thread_count()
     {
         return num_hw_threads_;
+    }
+
+    inline uint32_t num_workers()
+    {
+        return num_workers_;
     }
 
 private:

@@ -12,10 +12,10 @@
 #pragma once
 
 #include <atomic>
-#include "JobRocket/AtomicCounter.hpp"
+#include "JobRocket/Detail/AtomicCounter.hpp"
 #include "JobRocket/Scheduler.hpp"
 
-namespace sky {
+namespace jobrocket {
 
 
 class JobGroup {
@@ -29,7 +29,7 @@ public:
     {
         job_count_.increment();
 
-        auto job = make_job(function, std::forward<Args...>(args)...);
+        auto job = make_unmanaged_job(function, std::forward<Args...>(args)...);
         job.group_counter = &job_count_;
 
         scheduler_->run_job(job);

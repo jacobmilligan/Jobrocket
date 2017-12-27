@@ -23,7 +23,7 @@
 //  pp. 21–28, viewed <http://doi.acm.org/10.1145/1073970.1073974>.
 //
 
-namespace sky {
+namespace jobrocket {
 
 class FixedWorkStealingQueue {
 public:

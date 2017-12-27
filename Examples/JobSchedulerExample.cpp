@@ -1,6 +1,6 @@
 //
 //  JobSchedulerExample.cpp
-//  JobRocket
+//  JobRocket Examples
 //
 //  --------------------------------------------------------------
 //
@@ -9,7 +9,7 @@
 //  Copyright (c) 2016 Jacob Milligan. All rights reserved.
 //
 
-#include <JobRocket/FixedWorkStealingQueue.hpp>
+#include <JobRocket/Detail/FixedWorkStealingQueue.hpp>
 #include <random>
 #include <thread>
 
@@ -47,7 +47,7 @@ double big_calculation(const uint32_t value)
     return result;
 }
 
-void parallel_for(std::atomic_uint* job_count, std::thread* threads, sky::FixedWorkStealingQueue* queues,
+void parallel_for(std::atomic_uint* job_count, std::thread* threads, jobrocket::FixedWorkStealingQueue* queues,
                   std::atomic_bool* active, const int value)
 {
     if ( value > 0 ) {
@@ -55,7 +55,8 @@ void parallel_for(std::atomic_uint* job_count, std::thread* threads, sky::FixedW
         auto thread_id = std::this_thread::get_id();
         for ( int t = 0; t < num_threads; ++t ) {
             if ( thread_id == threads[t].get_id() ) {
-                auto job = sky::make_job(parallel_for, job_count, threads, queues, active, value - 1);
+                auto job = jobrocket::make_unmanaged_job(parallel_for, job_count, threads, queues,
+                                                         active, value - 1);
                 queues[t].push(job);
                 job_count->fetch_add(1);
             }
@@ -76,22 +77,22 @@ void queue_example()
 {
     std::atomic_bool active(false);
     std::thread threads[num_threads];
-    std::vector<sky::FixedWorkStealingQueue> queues;
+    std::vector<jobrocket::FixedWorkStealingQueue> queues;
 
     std::atomic_uint job_count(num_jobs);
 
     auto worker_proc = [&](const size_t index) {
-        sky::Job* job = nullptr;
+        jobrocket::Job* job = nullptr;
         while ( active.load() ) {
             auto pop_success = queues[index].pop(&job);
-            if ( pop_success && job->state == sky::Job::State::ready ) {
+            if ( pop_success && job->state == jobrocket::Job::State::ready ) {
                 job->execute();
                 --job_count;
             } else {
                 auto rand_worker = random_index() % num_threads;
                 if ( rand_worker != index ) {
                     auto steal_success = queues[rand_worker].steal(&job);
-                    if ( steal_success && job->state == sky::Job::State::ready ) {
+                    if ( steal_success && job->state == jobrocket::Job::State::ready ) {
                         job->execute();
                         --job_count;
                     }
@@ -112,7 +113,7 @@ void queue_example()
     auto start = std::chrono::high_resolution_clock::now();
 
     for ( int t = 0; t < num_jobs; ++t ) {
-        auto job = sky::make_job(big_calculation, static_cast<uint32_t>(t));
+        auto job = jobrocket::make_unmanaged_job(big_calculation, static_cast<uint32_t>(t));
         queues[t % num_threads].push(job);
     }
 

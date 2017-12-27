@@ -13,7 +13,7 @@
 
 #include <hwloc.h>
 
-namespace sky {
+namespace jobrocket {
 
 
 Scheduler::~Scheduler()
@@ -51,7 +51,7 @@ void Scheduler::startup(const int32_t num_threads)
     workers_.resize(num_workers_);
     uint32_t worker_id = 0;
     for ( auto& w : workers_ ) {
-        w = std::move(sky::Worker(worker_id++, workers_.data(), num_workers_, job_capacity_per_worker));
+        w = std::move(jobrocket::Worker(worker_id++, workers_.data(), num_workers_, job_capacity_per_worker));
     }
 
     // Start all worker threads except for worker 0. Worker 0 is reserved for the main thread so

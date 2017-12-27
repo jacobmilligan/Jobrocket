@@ -1,1 +1,2 @@
-add_sources(Scheduler.cpp)
+add_sources(Scheduler.cpp
+        JobRocket.cpp)

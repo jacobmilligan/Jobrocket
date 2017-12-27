@@ -25,7 +25,7 @@ TEST_CASE("Job pool hash is unique per thread", "[job_pool]")
     std::thread threads[num_threads];
     uint32_t hashes[num_threads];
 
-    sky::JobPool pool(num_threads, 100);
+    jobrocket::JobPool pool(num_threads, 100);
 
     bool waiting = true;
 
@@ -60,11 +60,11 @@ TEST_CASE("Job pool hash is unique per thread", "[job_pool]")
 
 TEST_CASE("Freeing jobs works as intended", "[job_pool]")
 {
-    sky::JobPool pool(2, 100);
+    jobrocket::JobPool pool(2, 100);
 
-    sky::Job* j1 = nullptr;
-    sky::Job* j2 = nullptr;
-    sky::Job* j3 = nullptr;
+    jobrocket::Job* j1 = nullptr;
+    jobrocket::Job* j2 = nullptr;
+    jobrocket::Job* j3 = nullptr;
 
     std::thread([&]() {
         j1 = pool.allocate_job([&]() {

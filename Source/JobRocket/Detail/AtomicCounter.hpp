@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <atomic>
 
-namespace sky {
+namespace jobrocket {
 
 
 class AtomicCounter {

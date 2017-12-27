@@ -11,13 +11,13 @@
 
 #pragma once
 
-#include "JobRocket/FixedWorkStealingQueue.hpp"
-#include "JobRocket/RNG.hpp"
+#include "JobRocket/Detail/FixedWorkStealingQueue.hpp"
+#include "JobRocket/Detail/RNG.hpp"
 
 #include <thread>
 #include <cassert>
 
-namespace sky {
+namespace jobrocket {
 
 
 class Worker {
@@ -123,14 +123,14 @@ public:
         Job* next_job = nullptr;
 
         auto pop_success = queue_.pop(next_job);
-        if ( pop_success && next_job->state == sky::Job::State::ready ) {
+        if ( pop_success && next_job != nullptr && next_job->state == jobrocket::Job::State::ready ) {
             return next_job;
         }
 
         auto rand_worker = rand_.next() % num_workers_;
         if ( rand_worker != id_ ) {
             auto steal_success = workers_[rand_worker].queue_.steal(next_job);
-            if ( steal_success && next_job->state == sky::Job::State::ready ) {
+            if ( steal_success && next_job != nullptr  && next_job->state == jobrocket::Job::State::ready ) {
                 return next_job;
             }
         }
@@ -154,7 +154,7 @@ private:
 
     void main_proc()
     {
-        sky::Job* job = nullptr;
+        jobrocket::Job* job = nullptr;
         state_ = State::running;
 
         while ( active_ ) {
@@ -167,4 +167,4 @@ private:
 };
 
 
-} // namespace sky
+} // namespace jobrocket

@@ -12,7 +12,7 @@
 #pragma once
 
 
-namespace sky {
+namespace jobrocket {
 
 
 // Xoroshiro128+ Random Number Generator.

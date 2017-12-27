@@ -12,13 +12,13 @@
 #pragma once
 
 #include "JobRocket/Meta/Apply.hpp"
-#include "JobRocket/AtomicCounter.hpp"
-#include "FixedPoolAllocator.hpp"
+#include "JobRocket/Detail/AtomicCounter.hpp"
+#include "JobRocket/Detail/FixedPoolAllocator.hpp"
 
 #include <tuple>
 #include <thread>
 
-namespace sky {
+namespace jobrocket {
 
 
 struct JobFunctionBase {
@@ -93,7 +93,7 @@ struct Job {
 
 
 template <typename Fn, typename... Args>
-Job make_job(Fn function, Args&&... args)
+Job make_unmanaged_job(Fn function, Args&& ... args)
 {
     auto data = JobFunction<Fn, Args...>(function, std::forward<Args>(args)...);
     return Job(data.size(), &data, 0);
