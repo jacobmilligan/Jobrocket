@@ -19,6 +19,7 @@
 
 namespace jobrocket {
 namespace detail {
+namespace impl {
 
 
 template <class Fn, class Tuple, size_t... Index>
@@ -28,13 +29,15 @@ constexpr decltype(auto) apply_impl(Fn&& function, Tuple&& tuple, index_sequence
 }
 
 
-} // namespace detail
+} // namespace impl
+
+
 
 
 template <class Fn, class Tuple>
 constexpr decltype(auto) apply(Fn&& function, Tuple&& tuple)
 {
-    return detail::apply_impl(std::forward<Fn>(function),
+    return impl::apply_impl(std::forward<Fn>(function),
                               std::forward<Tuple>(tuple),
                               make_index_sequence<
                                   std::tuple_size<
@@ -44,4 +47,5 @@ constexpr decltype(auto) apply(Fn&& function, Tuple&& tuple)
 }
 
 
+}  // namespace detail
 } // namespace jobrocket

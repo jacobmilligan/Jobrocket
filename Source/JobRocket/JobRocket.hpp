@@ -47,4 +47,4 @@ static void make_job_and_wait(Fn function, Args&& ... args)
 };
 
 
-}
+} // namespace jobrocket

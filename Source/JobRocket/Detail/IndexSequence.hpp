@@ -14,6 +14,7 @@
 #include <cstddef>
 
 namespace jobrocket {
+namespace detail {
 
 // Based on: https://stackoverflow.com/questions/17424477/implementation-c14-make-integer-sequence
 
@@ -55,4 +56,7 @@ struct make_index_sequence<1> : public index_sequence<0>
 template <typename... T>
 using index_sequence_for = make_index_sequence<sizeof...(T)>;
 
-}
+
+
+} // namespace detail
+} // namespace jobrocket

@@ -41,7 +41,7 @@ struct JobFunction : JobFunctionBase {
 
     void execute() override
     {
-        apply(function_ptr, arg_tuple);
+        detail::apply(function_ptr, arg_tuple);
     }
 };
 

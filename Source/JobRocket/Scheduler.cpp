@@ -95,4 +95,4 @@ void Scheduler::run_job(Job* job)
 }
 
 
-}
+} // namespace jobrocket

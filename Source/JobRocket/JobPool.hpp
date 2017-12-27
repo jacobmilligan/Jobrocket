@@ -144,7 +144,7 @@ private:
 };
 
 
-}
+} // namespace jobrocket
 
 
 
