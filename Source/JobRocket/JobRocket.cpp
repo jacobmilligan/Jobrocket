@@ -45,6 +45,11 @@ Scheduler* current_scheduler()
     return &JobRocket::scheduler;
 }
 
+void run(Job* job)
+{
+    JobRocket::scheduler.run_job(job);
+}
+
 void wait(const Job* job)
 {
     Job* next_job = nullptr;

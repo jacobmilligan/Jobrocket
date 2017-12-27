@@ -34,6 +34,8 @@ static Job* make_job(Fn function, Args&& ... args)
     return current_job_pool()->allocate_job(function, std::forward<Args>(args)...);
 };
 
+void run(Job* job);
+
 void wait(const Job* job);
 
 template <typename Fn, typename... Args>

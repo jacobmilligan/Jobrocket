@@ -73,20 +73,25 @@ int main(int argc, char** argv)
 {
     jobrocket::startup();
 
-    fmt::print("Start ({0} workers): {1}\n", jobrocket::current_scheduler()->num_workers(), countdown);
+    fmt::print("Start value ({0} workers): {1}\n", jobrocket::current_scheduler()->num_workers(), countdown);
 
     jobrocket::JobGroup group;
     for ( int i = 0; i < num_jobs; ++i ) {
-        group.run(print_job, "Hey", uint32_t(i));
+        group.run(print_job, "Job Group", uint32_t(i));
     }
 
     group.wait_for_all();
 
-    fmt::print("Finish: {0}\n", countdown);
+    fmt::print("Finish value: {0}\n\n", countdown);
 
     jobrocket::make_job_and_wait(print_job, "Single job wait", 0);
 
-    fmt::print("Done job\n");
+    fmt::print("Done\n\n");
+
+    auto job = jobrocket::make_job(print_job, "Manual job run and wait", 0);
+    jobrocket::run(job);
+    jobrocket::wait(job);
+    fmt::print("Done\n\n");
 
     jobrocket::shutdown();
 
