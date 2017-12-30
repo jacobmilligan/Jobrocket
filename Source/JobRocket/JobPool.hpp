@@ -19,11 +19,17 @@
 
 namespace jobrocket {
 
-
+/// JobPools allocate and recycle `Job` objects efficiently and in a thread-safe manner. Preferably
+/// only one JobPool and one `Scheduler` should be active at any given time in an application as
+/// the pool must maintain as many allocators and free-lists as there are worker and main threads
+/// which can take up a bit of memory for larger numbers of threads.
 class JobPool {
 public:
     JobPool() = default;
 
+    /// @param num_threads Total number of threads including workers and main threads that will
+    /// need to be able to allocate and free jobs
+    /// @param capacity The max number of jobs available to allocate per thread
     JobPool(const uint32_t num_threads, const uint32_t capacity)
     {
         num_threads_ = num_threads;
@@ -39,6 +45,8 @@ public:
         }
     }
 
+    /// Allocates a new job. Checks first if the current threads free-list is full and if so,
+    /// frees all previously freed jobs for this thread before allocating
     template <typename Fn, typename... Args>
     Job* allocate_job(Fn function, Args&&... args)
     {
@@ -65,6 +73,7 @@ public:
         return job;
     }
 
+    /// Iterates the free-list and frees all jobs previously added with `free_job`
     void free_all_this_thread()
     {
         auto& index = get_index();
@@ -73,11 +82,13 @@ public:
         }
     }
 
+    /// Adds a job to a list to free later
     void free_job(Job*& job)
     {
         free_lists_[job->worker_alloc].push(job);
     }
 
+    /// Resets all free lists and allocators
     void reset()
     {
         for ( int i = 0; i < num_threads_; ++i ) {
