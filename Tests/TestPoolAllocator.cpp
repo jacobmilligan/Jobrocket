@@ -20,7 +20,7 @@
 
 TEST_CASE("Test allocator recycles allocated memory in the order it was freed", "[pool]")
 {
-    jobrocket::FixedPoolAllocator allocator(sizeof(void*), 100);
+    jobrocket::detail::FixedPoolAllocator allocator(sizeof(void*), 100);
 
     std::array<void*, 6> blocks{};
 
@@ -69,7 +69,7 @@ TEST_CASE("Test allocator recycles allocated memory in the order it was freed", 
 TEST_CASE("Bad allocations return nullptr", "[pool]")
 {
     static constexpr size_t num_blocks = 100;
-    jobrocket::FixedPoolAllocator allocator(sizeof(void*), num_blocks);
+    jobrocket::detail::FixedPoolAllocator allocator(sizeof(void*), num_blocks);
 
     for ( int i = 0; i < num_blocks; ++i ) {
         auto* block = allocator.allocate();
@@ -82,7 +82,7 @@ TEST_CASE("Bad allocations return nullptr", "[pool]")
 
 TEST_CASE("Freeing nullptr outputs error", "[pool]")
 {
-    jobrocket::FixedPoolAllocator allocator(sizeof(void*), 100);
+    jobrocket::detail::FixedPoolAllocator allocator(sizeof(void*), 100);
     void* ptr = nullptr;
     auto success = allocator.free(ptr);
     REQUIRE(!success);
@@ -90,7 +90,7 @@ TEST_CASE("Freeing nullptr outputs error", "[pool]")
 
 TEST_CASE("Freeing too many blocks outputs error", "[pool]")
 {
-    jobrocket::FixedPoolAllocator allocator(sizeof(void*), 100);
+    jobrocket::detail::FixedPoolAllocator allocator(sizeof(void*), 100);
     auto* mem = allocator.allocate();
     auto success = allocator.free(mem);
     REQUIRE(success);
@@ -100,8 +100,8 @@ TEST_CASE("Freeing too many blocks outputs error", "[pool]")
 
 TEST_CASE("Freeing invalid pointer outputs error", "[pool]")
 {
-    jobrocket::FixedPoolAllocator allocator(sizeof(void*), 100);
-    jobrocket::FixedPoolAllocator allocator2(sizeof(void*), 100);
+    jobrocket::detail::FixedPoolAllocator allocator(sizeof(void*), 100);
+    jobrocket::detail::FixedPoolAllocator allocator2(sizeof(void*), 100);
 
     allocator.allocate();
     auto* mem2 = allocator2.allocate();

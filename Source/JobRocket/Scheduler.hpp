@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <unordered_map>
 #include "JobRocket/Worker.hpp"
 
 namespace jobrocket {
@@ -21,7 +22,7 @@ namespace jobrocket {
 class Scheduler {
 public:
     /// Flag for letting the scheduler decide how many worker threads to create
-    static constexpr int32_t auto_worker_count = -1;
+    static constexpr int32_t auto_thread_count = -1;
     static constexpr uint32_t job_capacity_per_worker = 4096;
 
     Scheduler() = default;
@@ -34,7 +35,7 @@ public:
 
     /// Starts the scheduler and all worker threads. Makes the startup thread wait until all workers
     /// are ready
-    void startup(int32_t num_threads);
+    void startup(int32_t num_threads, int32_t num_main_threads);
 
     /// Shuts down the scheduler by waiting until all workers have completed the current job. All
     /// jobs sitting in worker queues are discarded
@@ -43,6 +44,12 @@ public:
     /// Schedules a job onto the current threads local worker queue, making the job ready to
     /// execute
     void schedule_job(Job* job);
+
+    /// Registers the current thread as a main thread as long as the amount of main threads
+    /// registered doesn't exceed `num_main_threads`. Can be called from any `std::thread` and is
+    /// used to register threads that interact with the Scheduler and job system but aren't
+    /// worker threads - A games render thread for example.
+    void register_main_thread();
 
     /// Gets a pointer to the current threads associated worker
     Worker* thread_local_worker();
@@ -65,13 +72,26 @@ public:
         return num_workers_;
     }
 
+    /// Gets the max number of main threads the scheduler can support
+    inline uint32_t num_main_threads()
+    {
+        return num_main_threads_ + 1;
+    }
 private:
     uint32_t num_workers_{0};
+    uint32_t num_main_threads_{0};
     uint32_t num_cores_{0};
     uint32_t num_hw_threads_{0};
 
-    std::vector<Worker> workers_;
+    uint32_t next_main_{0};
 
+    std::vector<Worker> workers_;
+    std::unordered_map<std::thread::id, unsigned long> main_thread_map_;
+    std::mutex main_thread_mut_;
+
+    /// Figures out which worker belongs to the current thread. This is called once per thread
+    /// lazily the first time a thread calls `thread_local_worker` and the result should only be
+    /// assigned as to `static thread_local` function-scope variable in `thread_local_worker`
     Worker* find_local_worker();
 };
 

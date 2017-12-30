@@ -18,6 +18,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
+#include <algorithm>
 
 namespace jobrocket {
 namespace detail {
@@ -28,7 +29,7 @@ class FixedPoolAllocator {
 public:
     FixedPoolAllocator() = default;
 
-    FixedPoolAllocator(const size_t block_size, const size_t max_blocks)
+    FixedPoolAllocator(const size_t block_size, const uint32_t max_blocks)
     {
         assert(block_size >= sizeof(void*));
 
@@ -125,12 +126,22 @@ public:
             ptr += block_size_;
         }
     }
+
+    inline uint32_t block_capacity()
+    {
+        return max_blocks_;
+    }
+
+    inline uint32_t blocks_initialized()
+    {
+        return blocks_initialized_;
+    }
 private:
     uint8_t* memory_{nullptr};
     uint8_t* next_{nullptr};
 
     size_t block_size_{0};
-    size_t max_blocks_{0};
+    uint32_t max_blocks_{0};
 
     uint32_t blocks_initialized_{0};
 };

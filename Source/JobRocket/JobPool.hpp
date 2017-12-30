@@ -43,14 +43,21 @@ public:
     Job* allocate_job(Fn function, Args&&... args)
     {
         auto& index = get_index();
-        if ( free_lists_[index].full() ) {
+        if ( allocators_[index].blocks_initialized() == allocators_[index].block_capacity() ) {
             free_all_this_thread();
         }
 
         auto* job = static_cast<Job*>(allocators_[index].allocate());
 
+        if ( job == nullptr ) {
+            detail::print_error("JobPool", "Tried allocating a new job but there were no "
+                "jobs available in the pool");
+            return nullptr;
+        }
+
         new (job->function) JobFunction<Fn, Args...>(function, std::forward<Args>(args)...);
 
+        job->source_pool = this;
         job->worker_alloc = index;
         job->state = Job::State::ready;
         job->group_counter = nullptr;
@@ -112,6 +119,7 @@ private:
             auto n = --next_;
 
             auto* job = elements_[n];
+            elements_[n] = nullptr;
             return job;
         }
 

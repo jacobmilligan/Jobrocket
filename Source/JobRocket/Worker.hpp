@@ -31,12 +31,11 @@ public:
 
     Worker() = default;
 
-    Worker(const uint32_t id, Worker* workers, const uint32_t num_workers, const uint32_t max_jobs)
+    Worker(const uint32_t id, std::vector<Worker>* workers, const uint32_t max_jobs)
         : active_(false),
           queue_(max_jobs),
           rand_(1, 2),
           id_(id),
-          num_workers_(num_workers),
           workers_(workers),
           state_(State::ready)
     {}
@@ -55,7 +54,6 @@ public:
           queue_(std::move(other.queue_)),
           rand_(other.rand_),
           id_(other.id_),
-          num_workers_(other.num_workers_),
           workers_(other.workers_),
           active_(other.active_),
           state_(other.state_)
@@ -67,7 +65,6 @@ public:
         queue_ = std::move(other.queue_);
         rand_ = other.rand_;
         id_ = other.id_;
-        num_workers_ = other.num_workers_;
         workers_ = other.workers_;
         active_ = other.active_;
         state_ = other.state_;
@@ -75,36 +72,21 @@ public:
         return *this;
     }
 
-    void start()
-    {
-        active_ = true;
-        thread_ = std::thread(&Worker::main_proc, this);
+    void start();
 
-        while ( true ) {
-            if ( state_ == Worker::State::running ) {
-                break;
-            }
-        }
-    }
+    static void pause_all();
 
-    void stop()
-    {
-        active_ = false;
-        if ( thread_.joinable() ) {
-            thread_.join();
-        }
+    static void resume_all();
 
-        state_ = State::terminated;
-    }
+    void stop();
 
-    void schedule_job(Job* job)
+    inline void schedule_job(Job* job)
     {
         queue_.push(job);
     }
 
-    bool owns_this_thread()
+    inline bool owns_this_thread()
     {
-        auto hash = std::hash<std::thread::id>();
         return thread_.get_id() == std::this_thread::get_id();
     }
 
@@ -118,52 +100,23 @@ public:
         return id_;
     }
 
-    Job* get_next_job()
-    {
-        Job* next_job = nullptr;
-
-        auto pop_success = queue_.pop(next_job);
-        if ( pop_success && next_job != nullptr && next_job->state == jobrocket::Job::State::ready ) {
-            return next_job;
-        }
-
-        auto rand_worker = rand_.next() % num_workers_;
-        if ( rand_worker != id_ ) {
-            auto steal_success = workers_[rand_worker].queue_.steal(next_job);
-            if ( steal_success && next_job != nullptr  && next_job->state == jobrocket::Job::State::ready ) {
-                return next_job;
-            }
-        }
-
-        return nullptr;
-    }
+    Job* get_next_job();
 
 private:
     std::thread thread_;
     detail::FixedWorkStealingQueue queue_;
     detail::xoroshiro128 rand_{1, 2};
 
-    std::condition_variable cv_;
-    std::mutex mutex_;
-
     uint32_t id_{0};
-    uint32_t num_workers_{0};
-    Worker* workers_{nullptr};
+    std::vector<Worker>* workers_{nullptr};
     bool active_{false};
     State state_;
 
-    void main_proc()
-    {
-        jobrocket::Job* job = nullptr;
-        state_ = State::running;
+    static std::condition_variable cv_;
+    static std::mutex mutex_;
+    static bool paused_;
 
-        while ( active_ ) {
-            job = get_next_job();
-            if ( job != nullptr ) {
-                job->execute();
-            }
-        }
-    }
+    void main_proc();
 };
 
 

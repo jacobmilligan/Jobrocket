@@ -23,10 +23,11 @@ struct JobRocket {
 Scheduler JobRocket::scheduler;
 JobPool JobRocket::job_pool;
 
-void startup(int32_t num_workers)
+void startup(int32_t num_workers, int32_t num_main_threads)
 {
-    JobRocket::scheduler.startup(num_workers);
-    JobRocket::job_pool = JobPool(JobRocket::scheduler.num_workers(), JobRocket::pool_capacity);
+    JobRocket::scheduler.startup(num_workers, num_main_threads);
+    auto num_threads = JobRocket::scheduler.num_workers() + JobRocket::scheduler.num_main_threads();
+    JobRocket::job_pool = JobPool(num_threads, JobRocket::pool_capacity);
 }
 
 void shutdown()
@@ -57,8 +58,14 @@ void wait(const Job* job)
         next_job = JobRocket::scheduler.thread_local_worker()->get_next_job();
         if ( next_job != nullptr ) {
             next_job->execute();
+            next_job->source_pool->free_job(next_job);
         }
     }
+}
+
+void register_main_thread()
+{
+    JobRocket::scheduler.register_main_thread();
 }
 
 

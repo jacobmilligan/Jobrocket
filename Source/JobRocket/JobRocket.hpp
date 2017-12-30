@@ -22,7 +22,8 @@ namespace jobrocket {
 /// Starts up the global `Scheduler` and `JobPool`. If no value is specified for `num_workers` the
 /// scheduler decides how workers to create based off the current hardware - in most circumstances
 /// this is the most appropriate value.
-void startup(int32_t num_workers = Scheduler::auto_worker_count);
+void startup(int32_t num_workers = Scheduler::auto_thread_count,
+             int32_t num_main_threads = Scheduler::auto_thread_count);
 
 /// Shuts down the global scheduler by waiting until all workers have completed the current job.
 /// All jobs sitting in worker queues are discarded
@@ -64,6 +65,8 @@ void make_job_and_wait(Fn function, Args&& ... args)
     current_scheduler()->schedule_job(job);
     wait(job);
 }
+
+void register_main_thread();
 
 
 } // namespace jobrocket

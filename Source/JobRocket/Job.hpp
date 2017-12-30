@@ -19,6 +19,7 @@
 
 namespace jobrocket {
 
+class JobPool;
 
 struct JobFunctionBase {
     virtual void execute() = 0;
@@ -53,26 +54,28 @@ struct Job {
         completed
     };
 
+    JobPool* source_pool;
     State state;
     detail::AtomicCounter* group_counter;
     uint32_t worker_alloc;
 
-    static constexpr size_t data_size = sizeof(state) +
-                                        sizeof(group_counter) +
-                                        sizeof(worker_alloc);
+    static constexpr size_t data_size = sizeof(source_pool) + sizeof(state) +
+        sizeof(group_counter) + sizeof(worker_alloc);
 
     uint8_t function[64 - data_size]{};
 
     Job()
         : state(State::unknown),
           group_counter(nullptr),
-          worker_alloc(0)
+          worker_alloc(0),
+          source_pool(nullptr)
     {}
 
     Job(const size_t size, void* job_function, const uint32_t allocating_worker)
         : state(State::unknown),
           group_counter(nullptr),
-          worker_alloc(allocating_worker)
+          worker_alloc(allocating_worker),
+          source_pool(nullptr)
     {
         memcpy(function, job_function, size);
         state = State::ready;

@@ -13,6 +13,7 @@
 #include <JobRocket/JobGroup.hpp>
 
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 
 struct Timer {
     double value{0.0};
@@ -73,7 +74,7 @@ void print_job(const char* msg, const uint32_t index)
 
 int main(int argc, char** argv)
 {
-    jobrocket::startup();
+    jobrocket::startup(jobrocket::Scheduler::auto_thread_count, 1);
 
     fmt::print("Start value ({0} workers): {1}\n", jobrocket::current_scheduler()->num_workers(), countdown);
 
@@ -94,6 +95,22 @@ int main(int argc, char** argv)
     jobrocket::run(job);
     jobrocket::wait(job);
     fmt::print("Done\n\n");
+
+    auto t = std::thread([&]() {
+        jobrocket::register_main_thread();
+        while ( active ) {
+            jobrocket::make_job_and_wait([]() {
+                fmt::print("hey it's me ur main thread\n");
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            });
+        }
+    });
+
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    fmt::print("Shutting down secondary main thread\n");
+    active = false;
+    t.join();
 
     jobrocket::shutdown();
 

@@ -47,7 +47,7 @@ TEST_CASE("Workers perform as expected", "[worker]")
     workers.resize(num_threads);
 
     for ( auto& w : workers ) {
-        w = std::move(jobrocket::Worker(0, workers.data(), num_threads, num_jobs));
+        w = std::move(jobrocket::Worker(0, &workers, num_jobs));
     }
 
     for ( int i = 0; i < num_jobs; ++i ) {

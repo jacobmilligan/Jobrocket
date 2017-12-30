@@ -54,7 +54,7 @@ public:
     static constexpr size_t num_jobs = 100;
     static constexpr size_t num_threads = 4;
 
-    std::vector<jobrocket::FixedWorkStealingQueue> queues;
+    std::vector<jobrocket::detail::FixedWorkStealingQueue> queues;
     std::atomic_uint job_count{num_jobs};
 private:
     std::atomic_bool active_{false};

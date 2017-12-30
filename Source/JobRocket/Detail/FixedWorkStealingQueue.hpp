@@ -34,8 +34,7 @@ public:
     /// @brief Initializes the queue with `capacity` max number of jobs
     /// @param capacity
     explicit FixedWorkStealingQueue(const size_t capacity)
-        :
-        top_(0), bottom_(0), capacity_(capacity)
+        : top_(0), bottom_(0), capacity_(capacity)
     {
         jobs_.resize(capacity);
     }
@@ -44,11 +43,10 @@ public:
     FixedWorkStealingQueue& operator=(const FixedWorkStealingQueue& other) = delete;
 
     FixedWorkStealingQueue(FixedWorkStealingQueue&& other) noexcept
-        :
-        jobs_(std::move(other.jobs_)),
-        capacity_(other.capacity_),
-        bottom_(other.bottom_.load()),
-        top_(other.top_.load())
+        : jobs_(std::move(other.jobs_)),
+          capacity_(other.capacity_),
+          bottom_(other.bottom_.load()),
+          top_(other.top_.load())
     {}
 
     FixedWorkStealingQueue& operator=(FixedWorkStealingQueue&& other) noexcept
