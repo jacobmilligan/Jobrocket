@@ -53,13 +53,8 @@ void run(Job* job)
 
 void wait(const Job* job)
 {
-    Job* next_job = nullptr;
     while ( job->state != Job::State::completed ) {
-        next_job = JobRocket::scheduler.thread_local_worker()->get_next_job();
-        if ( next_job != nullptr ) {
-            next_job->execute();
-            next_job->source_pool->free_job(next_job);
-        }
+        JobRocket::scheduler.thread_local_worker()->try_run_job();
     }
 }
 

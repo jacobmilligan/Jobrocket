@@ -100,8 +100,7 @@ public:
         return id_;
     }
 
-    Job* get_next_job();
-
+    void try_run_job();
 private:
     std::thread thread_;
     detail::FixedWorkStealingQueue queue_;
@@ -117,6 +116,7 @@ private:
     static bool paused_;
 
     void main_proc();
+    Job* get_next_job();
 };
 
 

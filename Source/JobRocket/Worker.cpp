@@ -75,7 +75,6 @@ Job* Worker::get_next_job()
 
 void Worker::main_proc()
 {
-    jobrocket::Job* job = nullptr;
     state_ = State::running;
 
     while ( active_ ) {
@@ -86,12 +85,17 @@ void Worker::main_proc()
             state_ = State::running;
         }
 
-        job = get_next_job();
-        if ( job != nullptr ) {
-            job->execute();
-            if ( job->source_pool != nullptr ) {
-                job->source_pool->free_job(job);
-            }
+        try_run_job();
+    }
+}
+
+void Worker::try_run_job()
+{
+    auto* job = get_next_job();
+    if ( job != nullptr ) {
+        job->execute();
+        if ( job->source_pool != nullptr ) {
+            job->source_pool->free_job(job);
         }
     }
 }

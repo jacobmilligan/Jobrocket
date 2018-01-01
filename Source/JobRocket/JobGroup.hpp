@@ -38,12 +38,8 @@ public:
 
     void wait_for_all()
     {
-        Job* next_job = nullptr;
         while ( job_count_.load() > 0 ) {
-            next_job = current_scheduler()->thread_local_worker()->get_next_job();
-            if ( next_job != nullptr ) {
-                next_job->execute();
-            }
+            current_scheduler()->thread_local_worker()->try_run_job();
         }
     }
 private:
