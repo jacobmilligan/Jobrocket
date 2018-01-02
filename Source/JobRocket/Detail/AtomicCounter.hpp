@@ -37,15 +37,18 @@ public:
 
     void decrement()
     {
-        auto val = counter_--;
-        if ( val == 0 ) {
-            counter_.store(val, std::memory_order_relaxed);
+        auto val = counter_.load(std::memory_order_acquire);
+        if ( val > 0 ) {
+            counter_.store(val - 1, std::memory_order_release);
         }
     }
 
     void increment()
     {
-        ++counter_;
+        auto val = counter_.load(std::memory_order_acquire);
+        if ( val < UINT32_MAX ) {
+            counter_.store(val + 1, std::memory_order_release);
+        }
     }
 
 private:

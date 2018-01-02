@@ -88,6 +88,10 @@ private:
     std::vector<Worker> workers_;
     std::unordered_map<std::thread::id, unsigned long> main_thread_map_;
     std::mutex main_thread_mut_;
+    std::mutex worker_mut_;
+    std::condition_variable worker_cv_;
+
+    detail::AtomicCounter active_jobs_;
 
     /// Figures out which worker belongs to the current thread. This is called once per thread
     /// lazily the first time a thread calls `thread_local_worker` and the result should only be

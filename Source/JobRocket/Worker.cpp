@@ -9,20 +9,13 @@
 //  Copyright (c) 2016 Jacob Milligan. All rights reserved.
 //
 
-#include "JobRocket/Worker.hpp"
-#include "JobRocket/JobPool.hpp"
+#include "JobRocket/JobRocket.hpp"
 
 namespace jobrocket {
 
 
-std::condition_variable Worker::cv_;
-std::mutex Worker::mutex_;
-bool Worker::paused_ = false;
-
-
 void Worker::start()
 {
-    active_ = true;
     thread_ = std::thread(&Worker::main_proc, this);
 
     while ( true ) {
@@ -32,25 +25,16 @@ void Worker::start()
     }
 }
 
-void Worker::stop()
+void Worker::terminate()
 {
-    active_ = false;
-    if ( thread_.joinable() ) {
-        thread_.join();
-    }
-
     state_ = State::terminated;
 }
 
-void Worker::pause_all()
+void Worker::join()
 {
-    paused_ = true;
-}
-
-void Worker::resume_all()
-{
-    paused_ = false;
-    cv_.notify_one();
+    if ( thread_.joinable() ) {
+        thread_.join();
+    }
 }
 
 Job* Worker::get_next_job()
@@ -77,26 +61,33 @@ void Worker::main_proc()
 {
     state_ = State::running;
 
-    while ( active_ ) {
-        while ( paused_ ) {
-            state_ = State::waiting;
-            std::unique_lock<std::mutex> lock(mutex_);
-            cv_.wait(lock, [&]() { return !paused_; });
-            state_ = State::running;
+    while ( state_ != State::terminated ) {
+        {
+            std::unique_lock<std::mutex> lock(*mutex_);
+            cv_->wait(lock, [&]() { return state_ == State::terminated; });
         }
 
-        try_run_job();
+        while ( !queue_.empty() ) {
+            try_run_job();
+        }
     }
 }
 
 void Worker::try_run_job()
 {
     auto* job = get_next_job();
-    if ( job != nullptr ) {
-        job->execute();
-        if ( job->source_pool != nullptr ) {
-            job->source_pool->free_job(job);
-        }
+    if ( job == nullptr ) {
+        return;
+    }
+
+    job->execute();
+
+    if ( job->group_counter != nullptr ) {
+        job->group_counter->decrement();
+    }
+
+    if ( job->source_pool != nullptr ) {
+        job->source_pool->free_job(job);
     }
 }
 

@@ -86,10 +86,6 @@ struct Job {
         state = State::running;
         reinterpret_cast<JobFunctionBase*>(function)->execute();
         state = State::completed;
-        
-        if ( group_counter != nullptr ) {
-            group_counter->decrement();
-        }
     }
 };
 

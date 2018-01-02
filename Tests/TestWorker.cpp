@@ -64,7 +64,7 @@ TEST_CASE("Workers perform as expected", "[worker]")
     }
 
     for ( auto& w : workers ) {
-        w.stop();
+        w.terminate();
     }
 
     auto actual_result = 0.0;

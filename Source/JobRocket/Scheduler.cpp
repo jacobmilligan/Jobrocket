@@ -46,6 +46,8 @@ uint32_t Scheduler::auto_worker_count_value()
 
 void Scheduler::startup(const int32_t num_threads, const int32_t num_main_threads)
 {
+    active_jobs_.store(0);
+
     if ( num_threads <= auto_thread_count ) {
         num_workers_ = auto_worker_count_value();
     } else {
@@ -59,7 +61,7 @@ void Scheduler::startup(const int32_t num_threads, const int32_t num_main_thread
     workers_.resize(num_workers_ + num_main_threads + 1);
     uint32_t worker_id = 0;
     for ( auto& w : workers_ ) {
-        w = std::move(Worker(worker_id++, &workers_, job_capacity_per_worker));
+        w = std::move(Worker(worker_id++, &workers_, job_capacity_per_worker, &worker_mut_, &worker_cv_));
     }
 
     // Start all worker threads except main threads
@@ -73,7 +75,11 @@ void Scheduler::startup(const int32_t num_threads, const int32_t num_main_thread
 void Scheduler::shutdown()
 {
     for ( auto& w : workers_ ) {
-        w.stop();
+        w.terminate();
+    }
+    worker_cv_.notify_all();
+    for ( auto& w : workers_ ) {
+        w.join();
     }
 }
 
@@ -137,6 +143,7 @@ Worker* Scheduler::thread_local_worker()
 void Scheduler::schedule_job(Job* job)
 {
     thread_local_worker()->schedule_job(job);
+    worker_cv_.notify_all();
 }
 
 

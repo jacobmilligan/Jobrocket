@@ -31,18 +31,21 @@ public:
 
     Worker() = default;
 
-    Worker(const uint32_t id, std::vector<Worker>* workers, const uint32_t max_jobs)
-        : active_(false),
-          queue_(max_jobs),
+    Worker(const uint32_t id, std::vector<Worker>* workers, const uint32_t max_jobs,
+           std::mutex* parent_mutex, std::condition_variable* parent_cv)
+        : queue_(max_jobs),
           rand_(1, 2),
           id_(id),
           workers_(workers),
-          state_(State::ready)
+          state_(State::ready),
+          mutex_(parent_mutex),
+          cv_(parent_cv)
     {}
 
     ~Worker()
     {
-        stop();
+        terminate();
+        join();
     }
 
     Worker(const Worker& other) = delete;
@@ -55,8 +58,9 @@ public:
           rand_(other.rand_),
           id_(other.id_),
           workers_(other.workers_),
-          active_(other.active_),
-          state_(other.state_)
+          state_(other.state_),
+          mutex_(other.mutex_),
+          cv_(other.cv_)
     {}
 
     Worker& operator=(Worker&& other) noexcept
@@ -66,19 +70,18 @@ public:
         rand_ = other.rand_;
         id_ = other.id_;
         workers_ = other.workers_;
-        active_ = other.active_;
         state_ = other.state_;
+        mutex_ = other.mutex_;
+        cv_ = other.cv_;
 
         return *this;
     }
 
     void start();
 
-    static void pause_all();
+    void terminate();
 
-    static void resume_all();
-
-    void stop();
+    void join();
 
     inline void schedule_job(Job* job)
     {
@@ -108,12 +111,10 @@ private:
 
     uint32_t id_{0};
     std::vector<Worker>* workers_{nullptr};
-    bool active_{false};
     State state_;
 
-    static std::condition_variable cv_;
-    static std::mutex mutex_;
-    static bool paused_;
+    std::condition_variable* cv_;
+    std::mutex* mutex_;
 
     void main_proc();
     Job* get_next_job();
