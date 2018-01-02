@@ -62,7 +62,7 @@ public:
     /// @brief Pushes a new job onto the bottom of the queue - must be called from owning thread
     /// @param job
     /// @return True if successful push, false otherwise
-    bool push(Job* job)
+    void push(Job* job)
     {
         auto b = bottom_.load(std::memory_order_relaxed);
         auto t = top_.load(std::memory_order_acquire);
@@ -70,8 +70,8 @@ public:
         jobs_[b % capacity_] = job;
 
         std::atomic_thread_fence(std::memory_order_release);
+        ++counter_;
         bottom_.store(b + 1, std::memory_order_relaxed);
-        return true;
     }
 
     /// @brief Pops the next job from the bottom of the queue - must be called from owning thread
@@ -91,12 +91,14 @@ public:
         if ( t <= b ) {
             result = true;
             target = jobs_[b % capacity_];
+            --counter_;
             // Check if this is the last element in queue
             if ( t == b ) {
                 // Return false if race lost with stealing thread
                 if ( !top_.compare_exchange_strong(t, t + 1, std::memory_order_seq_cst,
                                                    std::memory_order_relaxed) ) {
                     result = false;
+                    ++counter_;
                 }
 
                 // last element - don't store decremented value
@@ -131,11 +133,13 @@ public:
         if ( t < b ) {
             result = true;
             target = jobs_[t % capacity_];
+            --counter_;
 
             // Return false if race lost with popping or stealing thread
             if ( !top_.compare_exchange_strong(t, t + 1, std::memory_order_seq_cst,
                                                std::memory_order_relaxed) ) {
                 result = false;
+                ++counter_;
             }
         }
 
@@ -155,6 +159,7 @@ public:
 
 private:
     size_t capacity_{0};
+    uint32_t counter_{0};
     std::atomic<uint64_t> top_{0};
     std::atomic<uint64_t> bottom_{0};
 

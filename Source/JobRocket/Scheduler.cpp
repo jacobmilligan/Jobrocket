@@ -144,7 +144,7 @@ Worker* Scheduler::thread_local_worker()
 void Scheduler::schedule_job(Job* job)
 {
     thread_local_worker()->schedule_job(job);
-    worker_cv_.notify_one();
+    worker_cv_.notify_all();
 }
 
 

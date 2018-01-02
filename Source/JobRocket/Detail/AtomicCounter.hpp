@@ -13,6 +13,7 @@
 
 #include <cstdint>
 #include <atomic>
+#include <thread>
 
 namespace jobrocket {
 namespace detail {
@@ -37,18 +38,16 @@ public:
 
     void decrement()
     {
-        auto val = counter_.load(std::memory_order_acquire);
-        if ( val > 0 ) {
-            counter_.store(val - 1, std::memory_order_release);
+        auto val = --counter_;
+        if ( val + 1 == 0 ) {
+            counter_.store(0, std::memory_order_relaxed);
         }
     }
 
     void increment()
     {
-        auto val = counter_.load(std::memory_order_acquire);
-        if ( val < UINT32_MAX ) {
-            counter_.store(val + 1, std::memory_order_release);
-        }
+        auto val = ++counter_;
+        std::this_thread::sleep_for(std::chrono::nanoseconds(1));
     }
 
 private:

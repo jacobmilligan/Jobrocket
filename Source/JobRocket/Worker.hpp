@@ -104,7 +104,7 @@ public:
         return id_;
     }
 
-    bool try_run_job();
+    void try_run_job();
 private:
     std::thread thread_;
     detail::FixedWorkStealingQueue queue_;

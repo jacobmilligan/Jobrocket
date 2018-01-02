@@ -59,15 +59,15 @@ Job* Worker::get_next_job()
 
 void Worker::schedule_job(Job* job)
 {
-    queue_.push(job);
     active_jobs_->increment();
+    queue_.push(job);
 }
 
-bool Worker::try_run_job()
+void Worker::try_run_job()
 {
     auto* job = get_next_job();
     if ( job == nullptr ) {
-        return false;
+        return;
     }
 
     job->execute();
@@ -81,8 +81,6 @@ bool Worker::try_run_job()
     }
 
     active_jobs_->decrement();
-
-    return true;
 }
 
 void Worker::main_proc()
@@ -97,7 +95,9 @@ void Worker::main_proc()
             });
         }
 
-        try_run_job();
+        do {
+            try_run_job();
+        } while ( !queue_.empty() && active_jobs_->load() > 0 );
     }
 }
 
