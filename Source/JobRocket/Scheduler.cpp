@@ -61,7 +61,8 @@ void Scheduler::startup(const int32_t num_threads, const int32_t num_main_thread
     workers_.resize(num_workers_ + num_main_threads + 1);
     uint32_t worker_id = 0;
     for ( auto& w : workers_ ) {
-        w = std::move(Worker(worker_id++, &workers_, job_capacity_per_worker, &worker_mut_, &worker_cv_));
+        w = std::move(Worker(worker_id++, &workers_, job_capacity_per_worker, &worker_mut_,
+                             &worker_cv_, &active_jobs_));
     }
 
     // Start all worker threads except main threads
@@ -143,7 +144,7 @@ Worker* Scheduler::thread_local_worker()
 void Scheduler::schedule_job(Job* job)
 {
     thread_local_worker()->schedule_job(job);
-    worker_cv_.notify_all();
+    worker_cv_.notify_one();
 }
 
 

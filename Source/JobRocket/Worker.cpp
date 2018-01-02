@@ -57,27 +57,17 @@ Job* Worker::get_next_job()
     return nullptr;
 }
 
-void Worker::main_proc()
+void Worker::schedule_job(Job* job)
 {
-    state_ = State::running;
-
-    while ( state_ != State::terminated ) {
-        {
-            std::unique_lock<std::mutex> lock(*mutex_);
-            cv_->wait(lock, [&]() { return state_ == State::terminated; });
-        }
-
-        while ( !queue_.empty() ) {
-            try_run_job();
-        }
-    }
+    queue_.push(job);
+    active_jobs_->increment();
 }
 
-void Worker::try_run_job()
+bool Worker::try_run_job()
 {
     auto* job = get_next_job();
     if ( job == nullptr ) {
-        return;
+        return false;
     }
 
     job->execute();
@@ -88,6 +78,26 @@ void Worker::try_run_job()
 
     if ( job->source_pool != nullptr ) {
         job->source_pool->free_job(job);
+    }
+
+    active_jobs_->decrement();
+
+    return true;
+}
+
+void Worker::main_proc()
+{
+    state_ = State::running;
+
+    while ( state_ != State::terminated ) {
+        if ( active_jobs_->load() <= 0 && !queue_.empty() ) {
+            std::unique_lock<std::mutex> lock(*mutex_);
+            cv_->wait(lock, [&]() {
+                return active_jobs_->load() > 0 || !queue_.empty() || state_ == State::terminated;
+            });
+        }
+
+        try_run_job();
     }
 }
 

@@ -43,11 +43,14 @@ TEST_CASE("Workers perform as expected", "[worker]")
     double values[num_jobs];
     jobrocket::Job jobs[num_jobs];
     std::vector<jobrocket::Worker> workers;
+    std::mutex mut;
+    std::condition_variable cv;
+    jobrocket::detail::AtomicCounter counter;
 
     workers.resize(num_threads);
 
     for ( auto& w : workers ) {
-        w = std::move(jobrocket::Worker(0, &workers, num_jobs));
+        w = std::move(jobrocket::Worker(0, &workers, num_jobs, &mut, &cv, &counter));
     }
 
     for ( int i = 0; i < num_jobs; ++i ) {

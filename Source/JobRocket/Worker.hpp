@@ -32,14 +32,16 @@ public:
     Worker() = default;
 
     Worker(const uint32_t id, std::vector<Worker>* workers, const uint32_t max_jobs,
-           std::mutex* parent_mutex, std::condition_variable* parent_cv)
+           std::mutex* parent_mutex, std::condition_variable* parent_cv,
+           detail::AtomicCounter* parent_counter)
         : queue_(max_jobs),
           rand_(1, 2),
           id_(id),
           workers_(workers),
           state_(State::ready),
           mutex_(parent_mutex),
-          cv_(parent_cv)
+          cv_(parent_cv),
+          active_jobs_(parent_counter)
     {}
 
     ~Worker()
@@ -60,7 +62,8 @@ public:
           workers_(other.workers_),
           state_(other.state_),
           mutex_(other.mutex_),
-          cv_(other.cv_)
+          cv_(other.cv_),
+          active_jobs_(other.active_jobs_)
     {}
 
     Worker& operator=(Worker&& other) noexcept
@@ -73,6 +76,7 @@ public:
         state_ = other.state_;
         mutex_ = other.mutex_;
         cv_ = other.cv_;
+        active_jobs_ = other.active_jobs_;
 
         return *this;
     }
@@ -83,10 +87,7 @@ public:
 
     void join();
 
-    inline void schedule_job(Job* job)
-    {
-        queue_.push(job);
-    }
+    void schedule_job(Job* job);
 
     inline bool owns_this_thread()
     {
@@ -103,7 +104,7 @@ public:
         return id_;
     }
 
-    void try_run_job();
+    bool try_run_job();
 private:
     std::thread thread_;
     detail::FixedWorkStealingQueue queue_;
@@ -115,6 +116,7 @@ private:
 
     std::condition_variable* cv_;
     std::mutex* mutex_;
+    detail::AtomicCounter* active_jobs_;
 
     void main_proc();
     Job* get_next_job();

@@ -74,6 +74,9 @@ void print_job(const char* msg, const uint32_t index)
 
 int main(int argc, char** argv)
 {
+    Timer timer;
+    timer.start();
+
     jobrocket::startup(jobrocket::Scheduler::auto_thread_count, 1);
 
     fmt::print("Start value ({0} workers): {1}\n", jobrocket::current_scheduler()->num_workers(), countdown);
@@ -88,7 +91,9 @@ int main(int argc, char** argv)
     fmt::print("Finish value: {0}\n\n", countdown);
 
     jobrocket::make_job_and_wait(print_job, "Single job wait", 0);
+    timer.stop();
 
+    fmt::print("Time: {}\n", timer.value);
     fmt::print("Done\n\n");
 
     auto job = jobrocket::make_job(print_job, "Manual job run and wait", 0);
@@ -113,6 +118,7 @@ int main(int argc, char** argv)
     t.join();
 
     jobrocket::shutdown();
+
 
     return 0;
 }
