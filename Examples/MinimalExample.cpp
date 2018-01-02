@@ -20,27 +20,27 @@ int main()
     jobrocket::startup(jobrocket::Scheduler::auto_thread_count,
                        jobrocket::Scheduler::auto_thread_count);
 
-//    // Allocate a few jobs using the job pool but don't run them
-//    auto* job1 = jobrocket::make_job([]() {
-//        printf("Hello from job 1\n");
-//    });
-//
-//    auto* job2 = jobrocket::make_job([]() {
-//        printf("Hello from job 2\n");
-//    });
-//
-//    // Allocate a job, run it, and then wait for the result
-//    jobrocket::make_job_and_wait([]() {
-//        printf("Hello from job 3\n");
-//    });
-//
-//    // Run the earlier-allocated jobs
-//    jobrocket::run(job1);
-//    jobrocket::run(job2);
-//
-//    // Wait for both to finish
-//    jobrocket::wait(job2);
-//    jobrocket::wait(job1);
+    // Allocate a few jobs using the job pool but don't run them
+    auto* job1 = jobrocket::make_job([]() {
+        printf("Hello from job 1\n");
+    });
+
+    auto* job2 = jobrocket::make_job([]() {
+        printf("Hello from job 2\n");
+    });
+
+    // Allocate a job, run it, and then wait for the result
+    jobrocket::make_job_and_wait([]() {
+        printf("Hello from job 3\n");
+    });
+
+    // Run the earlier-allocated jobs
+    jobrocket::run(job1);
+    jobrocket::run(job2);
+
+    // Wait for both to finish
+    jobrocket::wait(job2);
+    jobrocket::wait(job1);
 
     // JobRocket provides the `JobGroup` class to run many related jobs in parallel and wait on
     // all of them to finish
