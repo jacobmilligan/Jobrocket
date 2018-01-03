@@ -14,10 +14,11 @@ if (BUILD_TESTS)
     add_subdirectory(Tests)
 endif ()
 
+
 add_library(${PROJECT_NAME} ${source_list})
 
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/Deps/hwloc/install)
-    MESSAGE("-- JobRocket: Configuring and building 'hwloc'")
+    MESSAGE("-- Configuring and building 'hwloc' library")
     file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/Deps/hwloc/install)
     execute_process ( COMMAND ./autogen.sh
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Deps/hwloc/ )
@@ -35,7 +36,7 @@ if (hwloc_lib)
     target_link_libraries(${PROJECT_NAME} ${hwloc_lib})
 endif ()
 
-MESSAGE("-- JobRocket: Configuring and building 'fmt'")
+MESSAGE("-- Configuring and building 'fmt' library")
 add_subdirectory(Deps/fmt EXCLUDE_FROM_ALL)
 
 
