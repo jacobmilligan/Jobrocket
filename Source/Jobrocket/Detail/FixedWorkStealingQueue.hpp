@@ -27,12 +27,15 @@ namespace jobrocket {
 namespace detail {
 
 
+/// A lock-free work-stealing queue of a fixed, pre-allocated size. The queue is designed to act
+/// as a circular queue with no upper-bound, instead overwriting older elements when the capacity is
+/// reached - this is because the queue is intended to be used with short-running jobs and it's
+/// unlikely the queue will reach capacity while active jobs must be dequeued.
 class FixedWorkStealingQueue {
 public:
     FixedWorkStealingQueue() = default;
 
-    /// @brief Initializes the queue with `capacity` max number of jobs
-    /// @param capacity
+    /// Initializes the queue with `capacity` max number of jobs.
     explicit FixedWorkStealingQueue(const size_t capacity)
         : top_(0), bottom_(0), capacity_(capacity)
     {
@@ -59,9 +62,8 @@ public:
         return *this;
     }
 
-    /// @brief Pushes a new job onto the bottom of the queue - must be called from owning thread
-    /// @param job
-    /// @return True if successful push, false otherwise
+    /// Pushes a new job onto the bottom of the queue - must be called from the queues owning
+    /// thread
     void push(Job* job)
     {
         auto b = bottom_.load(std::memory_order_relaxed);
@@ -74,9 +76,8 @@ public:
         bottom_.store(b + 1, std::memory_order_relaxed);
     }
 
-    /// @brief Pops the next job from the bottom of the queue - must be called from owning thread
-    /// @param target
-    /// @return True if popped successfully, false otherwise
+    /// Pops the next job from the bottom of the queue - must be called from the queues
+    /// owning thread. Returns false if the pop operation failed.
     bool pop(Job*& target)
     {
         // Ensure bottom is decremented first to avoid popping duplicates
@@ -112,9 +113,8 @@ public:
         return result;
     }
 
-    /// @brief Steals a job from the top of the queue - can be called from any thread
-    /// @param target
-    /// @return True if successful steal, false otherwise
+    /// Steals a job from the top of the queue - can be called from any thread. Returns false if
+    /// the steal operation failed.
     bool steal(Job*& target)
     {
         // Ensure top is read first
@@ -147,9 +147,8 @@ public:
 
     }
 
-    /// @brief Checks if the queue is empty - note: not guaranteed to be accurate in concurrent
+    /// Checks if the queue is empty - note: not guaranteed to be accurate in concurrent
     /// environments for all threads
-    /// @return True if empty, false otherwise
     inline bool empty() const noexcept
     {
         auto b = bottom_.load(std::memory_order_relaxed);

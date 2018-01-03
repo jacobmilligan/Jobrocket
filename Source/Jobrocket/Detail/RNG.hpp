@@ -19,12 +19,14 @@ namespace detail {
 // Xoroshiro128+ Random Number Generator.
 // David Blackman & Sebastiano Vigna (2016).
 // Available at: http://xoroshiro.di.unimi.it/ [Accessed 11 Dec. 2017].
+
+/// A fast random number generating object that uses the Xoroshiro128+ algorithm.
 struct xoroshiro128 {
     xoroshiro128(const uint64_t seed_a, const uint64_t seed_b)
-        :
-        state{seed_a, seed_b}
+        : state{seed_a, seed_b}
     {}
 
+    /// Gets the next random number
     uint64_t next()
     {
         const uint64_t s0 = state[0];
@@ -38,9 +40,9 @@ struct xoroshiro128 {
         return result;
     }
 
-    // This is the jump function for the generator. It is equivalent
-    // to 2^64 calls to next(); it can be used to generate 2^64
-    // non-overlapping subsequences for parallel computations.
+    /// The jump function for the generator. It is equivalent
+    /// to 2^64 calls to next(); it can be used to generate 2^64
+    /// non-overlapping subsequences for parallel computations.
     void jump()
     {
         static const uint64_t JUMP[] = {0xbeac0467eba5facb, 0xd86b048b86aa9922};
@@ -61,7 +63,7 @@ struct xoroshiro128 {
     }
 
 private:
-    uint64_t state[2];
+    uint64_t state[2]{};
 
     static inline uint64_t rotl(const uint64_t x, int32_t k)
     {

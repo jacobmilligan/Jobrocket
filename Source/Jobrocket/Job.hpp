@@ -21,10 +21,13 @@ namespace jobrocket {
 
 class JobPool;
 
+/// Abstract base class used to call the function regardless of arguments
 struct JobFunctionBase {
     virtual void execute() = 0;
 };
 
+/// Holds a jobs function pointer and argument tuple, applying the
+/// arguments to the function and calling it when `execute()` is called.
 template <typename Fn, typename... Args>
 struct JobFunction : JobFunctionBase {
     Fn function_ptr;
@@ -46,7 +49,10 @@ struct JobFunction : JobFunctionBase {
     }
 };
 
+/// A job is a function pointer and series of arguments to the function as well as providing a link
+/// back to its thread-local allocating pool and `JobGroup` counter.
 struct Job {
+    /// Represents the state of a job at any given time
     enum class State {
         unknown,
         ready,
@@ -54,14 +60,20 @@ struct Job {
         completed
     };
 
+    /// The source pool from which the job was allocated and should be free'd from
     JobPool* source_pool;
+    /// The jobs current running state
     State state;
+    /// Pointer to the counter belonging to a `JobGroup` if the job belongs to one
     detail::AtomicCounter* group_counter;
+    /// The id of the worker that the job was allocated from
     uint32_t worker_alloc;
 
+    /// Size of all members, used to offset the function buffer
     static constexpr size_t data_size = sizeof(source_pool) + sizeof(state) +
         sizeof(group_counter) + sizeof(worker_alloc);
 
+    /// Buffer holding the `JobFunction` and associated arguments
     uint8_t function[64 - data_size]{};
 
     Job()
@@ -81,6 +93,7 @@ struct Job {
         state = State::ready;
     }
 
+    /// Runs the jobs function
     void execute()
     {
         state = State::running;
@@ -90,6 +103,7 @@ struct Job {
 };
 
 
+/// Makes a new job on the stack without a `JobPool`
 template <typename Fn, typename... Args>
 Job make_unmanaged_job(Fn function, Args&& ... args)
 {

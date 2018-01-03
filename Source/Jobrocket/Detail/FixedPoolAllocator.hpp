@@ -25,10 +25,15 @@ namespace detail {
 
 
 // TODO(Jacob): Implement alignment
+
+/// A pool of fixed-size that allocates raw memory in same-sized blocks. All memory managed by the
+/// allocator is created at construction and deleted at destruction.
 class FixedPoolAllocator {
 public:
     FixedPoolAllocator() = default;
 
+    /// Initializes the allocator with `block_size` bytes allocated per memory block and
+    /// `max_blocks` number of blocks capacity
     FixedPoolAllocator(const size_t block_size, const uint32_t max_blocks)
     {
         assert(block_size >= sizeof(void*));
@@ -68,8 +73,7 @@ public:
         delete[] memory_;
     }
 
-    /// @brief Allocates a new block of memory from the pool
-    /// @return Pointer to the memory
+    /// Allocates a new block of memory from the pool and returns a pointer to it
     void* allocate()
     {
         if ( blocks_initialized_ == max_blocks_ ) {
@@ -83,9 +87,8 @@ public:
         return block;
     }
 
-    /// @brief Frees memory allocated by allocate(). Provides undefined behavior if the data
-    /// wasn't allocated with allocate() and doesn't belong to memory_
-    /// @param data Data to free
+    /// Frees memory allocated by `allocate()`. If the data wasn't allocated by the internal pool,
+    /// this function causes undefined behaviour and will log an error
     bool free(void* data)
     {
         if ( data == nullptr ) {
@@ -113,6 +116,7 @@ public:
         return true;
     }
 
+    /// Resets the pool and zeroes out all memory
     void reset()
     {
         next_ = memory_;
@@ -127,11 +131,13 @@ public:
         }
     }
 
+    /// Gets the maximum number of blocks the pool can allocate
     inline uint32_t block_capacity()
     {
         return max_blocks_;
     }
 
+    /// Gets the current number of blocks allocated
     inline uint32_t blocks_initialized()
     {
         return blocks_initialized_;

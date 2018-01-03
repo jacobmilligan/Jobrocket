@@ -20,8 +20,14 @@
 namespace jobrocket {
 
 
+/// A representation of a worker thread in a scheduler. Each `Worker` owns a thread and its own
+/// work-stealing queue. The workers main process will keep popping jobs off its own queue until
+/// there are none left, in which case it will start stealing jobs from other workers to help with
+/// the overall work-load of the owning scheduler. Once no jobs are queued, the worker will go to
+/// sleep until signalled by its scheduler - for instance when a new job is scheduled.
 class Worker {
 public:
+    /// Represents the running state of a `Worker`
     enum class State {
         ready,
         running,
@@ -81,29 +87,37 @@ public:
         return *this;
     }
 
+    /// Starts the workers main procedure and forks a new thread to run jobs on.
     void start();
 
+    /// Terminates the thread but doesn't join it to the parent thread.
     void terminate();
 
+    /// Joins the worker, waiting until its completely terminated before destruction.
     void join();
 
+    /// Schedules a new job to the worker and notifies it to wake up.
     void schedule_job(Job* job);
 
+    /// Checks if the current thread is owned by this worker, returns true if so.
     inline bool owns_this_thread()
     {
         return thread_.get_id() == std::this_thread::get_id();
     }
 
+    /// Gets workers current running state
     inline State state()
     {
         return state_;
     }
 
+    /// Gets the workers id
     inline uint32_t id()
     {
         return id_;
     }
 
+    /// Attempts to pop or steal a job and execute it once
     void try_run_job();
 private:
     std::thread thread_;

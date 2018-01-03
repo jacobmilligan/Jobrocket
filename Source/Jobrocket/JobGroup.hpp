@@ -19,12 +19,15 @@
 namespace jobrocket {
 
 
+/// A grouping of many jobs that can be waited on until the final job in the group finishes
+/// execution
 class JobGroup {
 public:
     JobGroup()
         : job_count_(0)
     {}
 
+    /// Adds a job to the group and runs it
     template <typename Fn, typename... Args>
     void run(Fn function, Args&&... args)
     {
@@ -36,6 +39,9 @@ public:
         jobrocket::run(job);
     }
 
+    /// Waits for all jobs in the group to finish execution. Rather than sleeping or busy-waiting
+    /// this function will cause the calling thread to start popping and stealing jobs from queues
+    /// in an effort to help with the schedulers work-load
     void wait_for_all()
     {
         while ( job_count_.load() > 0 ) {
