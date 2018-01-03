@@ -1,0 +1,6 @@
+[submodule "Deps/hwloc"]
+	path = Deps/hwloc
+	url = https://github.com/open-mpi/hwloc.git
+[submodule "Deps/fmt"]
+	path = Deps/fmt
+	url = https://github.com/fmtlib/fmt.git

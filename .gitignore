@@ -1,5 +1,4 @@
 .idea
-Deps/
 cmake-build-debug/
 cmake-build-release/
 Build/

@@ -61,6 +61,7 @@ int main()
     // Wait for all jobs to finish
     group.wait_for_all();
 
+
     printf("Expected value: %d | Final value: %d\n", expected_result, value);
 
     jobrocket::shutdown();
