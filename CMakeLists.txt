@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.7.1)
-project(JobRocket)
+project(Jobrocket)
 set(CMAKE_CXX_STANDARD 14)
 
-include(${PROJECT_SOURCE_DIR}/CMake/tasks.cmake)
+include(${PROJECT_SOURCE_DIR}/CMake/jobrocket.cmake)
+
+jobrocket_init()
 
 add_subdirectory(Source)
 

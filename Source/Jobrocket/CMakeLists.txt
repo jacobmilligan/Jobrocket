@@ -1,4 +1,4 @@
-add_sources(Scheduler.cpp
+jobrocket_add_sources(Scheduler.cpp
         Jobrocket.cpp
         Worker.cpp)
 

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7.1)
 
-project(JobRocketTests)
+project(JobrocketTests)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -16,7 +16,7 @@ function(add_test test_name)
     endforeach()
     add_executable(${test_name} "${srcs}" TestsMain.cpp)
     target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/Source)
-    target_link_libraries(${test_name} JobRocket)
+    target_link_libraries(${test_name} Jobrocket)
     list(APPEND test_list "${test_name}")
 endfunction()
 
