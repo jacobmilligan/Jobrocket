@@ -48,5 +48,5 @@ if __name__ == '__main__':
     subprocess.call(args=cmd, cwd=build_type_dir)
 
     print_status('Building library')
-    subprocess.call(['cmake', '--build', build_type_dir], cwd=build_type_dir)
+    subprocess.call(['cmake', '--build', build_type_dir])
     print_status('Done')

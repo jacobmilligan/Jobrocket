@@ -1,10 +1,10 @@
-# JobRocket
+# Jobrocket
 
-JobRocket is a task-based parallelism library initially developed as an internal library for the [Skyrocket](https://github.com/jacobmilligan/Skyrocket) framework. It's designed to be lightweight with a simple interface, making use of C++11/14 concurrency primitives.
+Jobrocket is a task-based parallelism library initially developed as an internal library for the [Skyrocket](https://github.com/jacobmilligan/Skyrocket) framework. It's designed to be lightweight with a simple interface, making use of C++11/14 concurrency primitives.
 
 ## Example
 
-Here's a quick example of how to use JobRocket:
+Here's a quick example of how to use Jobrocket:
 
 ```cpp
 int main()
@@ -75,37 +75,66 @@ Expected value: 20100 | Final value: 20100
 
 ## Getting Started
 
-**Dependencies:**
+### Dependencies:
 
 * CMake
 * A compiler with minimum C++14 support
-* For examples:
-	* OpenGL
+* OpenGL 4.0+ (for examples)
+* Python 3+ (for build script)
 
-**Building:**
+### Building with `build.py`:
 
-Clone the repository and then `cd` into the root directory and run:
+Jobrocket comes with a python script to make building the library and dependencies super easy. If you'd rather go manual see **manual** instructions.
 
 ```shell
-mkdir Build && cd Build
-cmake ..
-make
+cd <Jobrocket_Root>
+./build.py --build-type=<Debug/Release>
+```
+
+The build script also has the following options:
+
+|Option|Description|
+|------|-----------|
+|`--build-examples`|Builds all example programs along with the library into `Build/<BUILD_TYPE>/Examples`|
+|`--build-tests`|Builds all unit tests along with the library|
+
+### Building manually:
+
+`cd` into the Jobrocket root directory and run the following commands:
+
+```shell
+# setup directories
+mkdir Build && mkdir Deps
+
+# fetch and download dependencies with git submodule
+git submodule update --init
+cd Build
+
+# make a directory for whatever configuration is going to be built (Debug or Release)
+mkdir <Debug/Release>
+cd <Debug/Release>
+
+# configure CMake files
+cmake ../.. -DCMAKE_BUILD_TYPE=<Debug/Release>
+
+# return to root directory and build the library
+cd ../..
+cmake --build Build/<Debug/Release>
 ```
 
 The following options are available with the CMake build by adding `-D<option>=on` after `cmake ..`
 
-|Option|Explanation|
+|Option|Description|
 |------|-----------|
-|`WITH_EXAMPLES`|Builds all example programs along with the library into `Build/<BUILD_TYPE>/Examples`|
-|`WITH_TESTS`|Builds all unit tests along with the library|
-|`CMAKE_BUILD_TYPE`|Type of build (Debug, Release)|
+|`BUILD_EXAMPLES`|Builds all example programs along with the library into `Build/<BUILD_TYPE>/Examples`|
+|`BUILD_TESTS`|Builds all unit tests along with the library|
 
 ## Usage
 
-To use JobRocket in your project first link the static library built in `/Build/` then add `JobRocket_Source_Directory/Source` to your projects include path.
+To use Jobrocket in your project first link the static library built in `/Build/` then add `Jobrocket_Root/Source` to your projects include path.
 
-To use the library and simple tasks, simply include `<JobRocket/JobRocket.hpp>`. To use `JobGroup` objects, include `<JobRocket/JobGroup>`.
+To use the library and simple tasks, simply include `<JobRocket/Jobrocket.hpp>`. To use `JobGroup` objects, include `<JobRocket/JobGroup>`.
 
 ## License
 
-JobRocket is available under the [MIT License](https://github.com/jacobmilligan/JobRocket/blob/master/LICENSE).
+Jobrocket is available under the [MIT License](https://github.com/jacobmilligan/Jobrocket/blob/master/LICENSE).
