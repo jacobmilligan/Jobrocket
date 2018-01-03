@@ -17,7 +17,7 @@ if (BUILD_TESTS)
 endif ()
 
 
-add_library(${PROJECT_NAME} ${source_list})
+add_library(${PROJECT_NAME} ${jobrocket_sources})
 
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/Deps/hwloc/install)
     MESSAGE("-- Configuring and building 'hwloc' library")
@@ -40,7 +40,6 @@ endif ()
 
 MESSAGE("-- Configuring and building 'fmt' library")
 add_subdirectory(Deps/fmt EXCLUDE_FROM_ALL)
-
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/Source)
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/Deps/hwloc/install/include)

@@ -1,5 +1,5 @@
 function(jobrocket_init)
-    unset(kit_sources CACHE)
+    unset(jobrocket_sources CACHE)
 endfunction()
 
 function(jobrocket_add_sources)
@@ -11,5 +11,5 @@ function(jobrocket_add_sources)
         list(APPEND srcs "${s}")
     endforeach()
 
-    set(jobrocket_source_list ${source_list} "${srcs}" CACHE INTERNAL "")
+    set(jobrocket_sources ${jobrocket_sources} "${srcs}" CACHE INTERNAL "")
 endfunction()
