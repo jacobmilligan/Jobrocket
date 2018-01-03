@@ -1,6 +1,6 @@
 # Jobrocket
 
-Jobrocket is a task-based parallelism library initially developed as an internal library for the [Skyrocket](https://github.com/jacobmilligan/Skyrocket) framework. It's designed to be lightweight with a simple interface, making use of C++11/14 concurrency primitives.
+Jobrocket is a task-based parallelism library initially developed as an internal library for the [Skyrocket](https://github.com/jacobmilligan/Skyrocket) framework. It's designed to be lightweight with a simple interface, making use of C++11/14 concurrency primitives. Internally, Jobrocket uses a lock-free work-stealing algorithm to schedule jobs to workers.
 
 ## Example
 
