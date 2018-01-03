@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7.1)
+cmake_minimum_required(VERSION 3.1.0)
 project(Jobrocket)
 set(CMAKE_CXX_STANDARD 14)
 
@@ -39,11 +39,11 @@ if (hwloc_lib)
 endif ()
 
 MESSAGE("-- Configuring and building 'fmt' library")
+
 add_subdirectory(Deps/fmt EXCLUDE_FROM_ALL)
+target_link_libraries(${PROJECT_NAME} fmt::fmt-header-only)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/Source)
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/Deps/hwloc/install/include)
 target_include_directories(${PROJECT_NAME} PUBLIC Tests/catch)
 target_include_directories(${PROJECT_NAME} PUBLIC Deps/fmt)
-
-target_link_libraries(${PROJECT_NAME} fmt::fmt-header-only)
