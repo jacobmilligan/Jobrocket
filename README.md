@@ -7,6 +7,9 @@ Jobrocket is a task-based parallelism library initially developed as an internal
 Here's a quick example of how to use Jobrocket:
 
 ```cpp
+#include <JobRocket/JobRocket.hpp>
+#include <JobRocket/JobGroup.hpp>
+
 int main()
 {
     // Launch the scheduler with the desired number of workers and main-threads.
