@@ -9,8 +9,8 @@
 //  Copyright (c) 2016 Jacob Milligan. All rights reserved.
 //
 
-#include "JobRocket/Scheduler.hpp"
-#include "JobRocket/Detail/Error.hpp"
+#include "Jobrocket/Scheduler.hpp"
+#include "Jobrocket/Detail/Error.hpp"
 
 #include <hwloc.h>
 

@@ -1,6 +1,6 @@
 //
 //  Job.hpp
-//  JobRocket
+//  Jobrocket
 //
 //  --------------------------------------------------------------
 //
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "JobRocket/Detail/Apply.hpp"
-#include "JobRocket/Detail/AtomicCounter.hpp"
+#include "Jobrocket/Detail/Apply.hpp"
+#include "Jobrocket/Detail/AtomicCounter.hpp"
 
 #include <tuple>
 #include <thread>

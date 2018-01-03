@@ -1,6 +1,6 @@
 //
-//  JobRocket.hpp
-//  JobRocket
+//  Jobrocket.hpp
+//  Jobrocket
 //
 //  --------------------------------------------------------------
 //
@@ -12,8 +12,8 @@
 #pragma once
 
 
-#include "JobRocket/JobPool.hpp"
-#include "JobRocket/Scheduler.hpp"
+#include "Jobrocket/JobPool.hpp"
+#include "Jobrocket/Scheduler.hpp"
 
 #include <cstdint>
 

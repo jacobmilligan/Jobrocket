@@ -1,6 +1,6 @@
 //
 //  FixedWorkStealingQueue.hpp
-//  JobRocket
+//  Jobrocket
 //
 //  --------------------------------------------------------------
 //
@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "JobRocket/Job.hpp"
+#include "Jobrocket/Job.hpp"
 
 #include <atomic>
 #include <vector>

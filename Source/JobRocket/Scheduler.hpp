@@ -12,7 +12,7 @@
 #pragma once
 
 #include <unordered_map>
-#include "JobRocket/Worker.hpp"
+#include "Jobrocket/Worker.hpp"
 
 namespace jobrocket {
 

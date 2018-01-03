@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "JobRocket/Detail/Error.hpp"
+#include "Jobrocket/Detail/Error.hpp"
 
 #include <cstdint>
 #include <cstddef>

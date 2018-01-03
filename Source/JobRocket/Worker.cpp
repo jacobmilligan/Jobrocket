@@ -1,6 +1,6 @@
 //
 //  Worker.cpp
-//  JobRocket
+//  Jobrocket
 //
 //  --------------------------------------------------------------
 //
@@ -9,7 +9,7 @@
 //  Copyright (c) 2016 Jacob Milligan. All rights reserved.
 //
 
-#include "JobRocket/JobRocket.hpp"
+#include "Jobrocket.hpp"
 
 namespace jobrocket {
 

@@ -1,6 +1,6 @@
 //
 //  Worker.hpp
-//  JobRocket
+//  Jobrocket
 //
 //  --------------------------------------------------------------
 //
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "JobRocket/Detail/FixedWorkStealingQueue.hpp"
-#include "JobRocket/Detail/RNG.hpp"
+#include "Jobrocket/Detail/FixedWorkStealingQueue.hpp"
+#include "Jobrocket/Detail/RNG.hpp"
 
 #include <thread>
 #include <cassert>

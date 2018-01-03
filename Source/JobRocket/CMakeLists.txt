@@ -1,5 +1,5 @@
 add_sources(Scheduler.cpp
-        JobRocket.cpp
+        Jobrocket.cpp
         Worker.cpp)
 
 add_subdirectory(Detail)

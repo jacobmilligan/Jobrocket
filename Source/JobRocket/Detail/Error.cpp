@@ -1,6 +1,6 @@
 //
 //  Error.cpp
-//  JobRocket
+//  Jobrocket
 //
 //  --------------------------------------------------------------
 //
@@ -9,7 +9,7 @@
 //  Copyright (c) 2016 Jacob Milligan. All rights reserved.
 //
 
-#include "JobRocket/Detail/Error.hpp"
+#include "Jobrocket/Detail/Error.hpp"
 
 #include <fmt/format.h>
 

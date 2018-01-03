@@ -1,6 +1,6 @@
 //
 //  JobPool.hpp
-//  JobRocket
+//  Jobrocket
 //
 //  --------------------------------------------------------------
 //
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "JobRocket/Job.hpp"
-#include "JobRocket/Detail/FixedPoolAllocator.hpp"
+#include "Jobrocket/Job.hpp"
+#include "Jobrocket/Detail/FixedPoolAllocator.hpp"
 
 #include <cstdint>
 #include <vector>
