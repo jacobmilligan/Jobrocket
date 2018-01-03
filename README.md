@@ -136,7 +136,7 @@ The following options are available with the CMake build by adding `-D<option>=o
 
 To use Jobrocket in your project first link the static library built in `/Build/` then add `Jobrocket_Root/Source` to your projects include path.
 
-To use the library and simple tasks, simply include `<JobRocket/Jobrocket.hpp>`. To use `JobGroup` objects, include `<JobRocket/JobGroup>`.
+To use the library and simple tasks, simply include `<Jobrocket/Jobrocket.hpp>`. To use `JobGroup` objects, include `<Jobrocket/JobGroup>`.
 
 ## License
 
