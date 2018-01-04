@@ -2,6 +2,7 @@
 
 import subprocess
 import os
+import shutil
 
 HTML_DIR = 'Generated/html'
 
@@ -21,10 +22,13 @@ def publish():
     print(output)
     if output:
         print_status("The working directory is dirty. Please commit any pending changes.")
-        return
+        # return
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
     output_dir = os.path.join(script_dir, HTML_DIR)
+
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
 
     print_status("Checking out gh-pages branch into public")
     subprocess.call(['git', 'worktree', 'add', '-B', 'gh-pages', HTML_DIR, 'origin/gh-pages'],
