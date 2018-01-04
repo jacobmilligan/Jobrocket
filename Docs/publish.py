@@ -39,7 +39,7 @@ def publish():
 
     print_status('Updating gh-pages branch')
     subprocess.call(['git', 'add', '--all'], cwd=output_dir)
-    subprocess.call(['git', 'commit', '-m', '"docs/API: Update API reference docs and HTML"'],
+    subprocess.call(['git', 'commit', '-m', 'docs/API: Update API reference docs and HTML'],
                     cwd=output_dir)
     subprocess.call(['git', 'push', 'origin', 'gh-pages'])
 
