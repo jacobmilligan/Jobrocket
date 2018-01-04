@@ -27,17 +27,17 @@ def publish():
     output_dir = os.path.join(script_dir, HTML_DIR)
 
     print_status("Checking out gh-pages branch into public")
-    subprocess.call(['git', 'worktree', 'add', '-B', 'gh-pages', HTML_DIR, 'origin/gh-pages'], cwd=script_dir)
+    subprocess.call(['git', 'worktree', 'add', '-B', 'gh-pages', HTML_DIR, 'origin/gh-pages'],
+                    cwd=script_dir)
 
     print_status('Generating HTML')
     subprocess.call(['doxygen', 'Doxyfile'], cwd=script_dir)
 
     print_status('Updating gh-pages branch')
     subprocess.call(['git', 'add', '--all'], cwd=output_dir)
-    subprocess.call(['git', 'commit', '-m','"docs/API: Update API reference docs and HTML"'], cwd=output_dir)
+    subprocess.call(['git', 'commit', '-m', '"docs/API: Update API reference docs and HTML"'],
+                    cwd=output_dir)
     subprocess.call(['git', 'push', 'origin', 'gh-pages'])
-
-
 
 if __name__ == '__main__':
     publish()
