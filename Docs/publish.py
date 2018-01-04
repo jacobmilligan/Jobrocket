@@ -18,6 +18,7 @@ def publish():
     result, err = cmd.communicate()
     output = result.decode('utf-8')
 
+    print(output)
     if output:
         print_status("The working directory is dirty. Please commit any pending changes.")
         return
