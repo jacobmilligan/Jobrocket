@@ -6,9 +6,9 @@ import subprocess
 
 
 def print_status(status):
-    GREEN = '\033[32m'
-    WHITE = '\033[0m'
-    print('{0}Jobrocket: {1}{2}'.format(GREEN, status, WHITE))
+    green = '\033[32m'
+    white = '\033[0m'
+    print('{0}Jobrocket: {1}{2}'.format(green, status, white))
 
 
 def deps_needs_init(deps_dir):
@@ -18,7 +18,7 @@ def deps_needs_init(deps_dir):
         os.path.exists(deps_dir)
 
 
-if __name__ == '__main__':
+def cli():
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--build-type', choices=['Debug', 'Release'], required=True)
     parser.add_argument('--build-examples', action='store_true')
@@ -57,3 +57,7 @@ if __name__ == '__main__':
     print_status('Building library')
     subprocess.call(['cmake', '--build', build_type_dir])
     print_status('Done')
+
+
+if __name__ == '__main__':
+    cli()
