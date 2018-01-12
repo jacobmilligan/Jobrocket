@@ -11,6 +11,13 @@ def print_status(status):
     print('{0}Jobrocket: {1}{2}'.format(GREEN, status, WHITE))
 
 
+def deps_needs_init(deps_dir):
+    fmt_path = os.path.join(deps_dir, 'fmt')
+    hwloc_path = os.path.join(deps_dir, 'hwloc')
+    return len(os.listdir(fmt_path)) <= 0 or len(os.listdir(hwloc_path)) <= 0 or not \
+        os.path.exists(deps_dir)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--build-type', choices=['Debug', 'Release'], required=True)
@@ -35,7 +42,7 @@ if __name__ == '__main__':
     build_type_dir = os.path.join(build_dir, args.build_type)
     deps_dir = os.path.join(os.getcwd(), 'Deps')
 
-    if not os.path.exists(deps_dir):
+    if deps_needs_init(deps_dir):
         print_status('Adding and building dependencies')
         os.mkdir(deps_dir)
         subprocess.call(['git', 'submodule', 'update', '--init'], cwd=deps_dir)
