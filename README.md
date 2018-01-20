@@ -85,46 +85,28 @@ Expected value: 20100 | Final value: 20100
 * CMake
 * A compiler with minimum C++14 support
 * OpenGL 4.0+ (for examples)
-* Python 3+ (for build script)
 
-### Building with `build.py`:
-
-Jobrocket comes with a python script to make building the library and dependencies super easy. If you'd rather go manual see **manual** instructions.
-
-```shell
-cd <Jobrocket_Root>
-./build.py --build-type=<Debug/Release>
-```
-
-The build script also has the following options:
-
-|Option|Description|
-|------|-----------|
-|`--build-examples`|Builds all example programs along with the library into `Build/<BUILD_TYPE>/Examples`|
-|`--build-tests`|Builds all unit tests along with the library|
-
-### Building manually:
+### Building:
 
 `cd` into the Jobrocket root directory and run the following commands:
 
 ```shell
 # setup directories
-mkdir Build && mkdir Deps
+mkdir Build
 
 # fetch and download dependencies with git submodule
-git submodule update --init
 cd Build
 
-# make a directory for whatever configuration is going to be built (Debug or Release)
-mkdir <Debug/Release>
-cd <Debug/Release>
+# make a directory for whatever configuration is going to be built (Debug/Release/RelWithDebInfo)
+mkdir <build type>
+cd <build type>
 
-# configure CMake files
-cmake ../.. -DCMAKE_BUILD_TYPE=<Debug/Release>
+# configure CMake files.
+# If running for the first time, all dependencies (git submodule) will be initialized and downloaded
+cmake ../.. -DCMAKE_BUILD_TYPE=<build type>
 
-# return to root directory and build the library
-cd ../..
-cmake --build Build/<Debug/Release>
+# Build the project
+cmake --build .
 ```
 
 The following options are available with the CMake build by adding `-D<option>=on` after `cmake ..`
@@ -133,9 +115,9 @@ The following options are available with the CMake build by adding `-D<option>=o
 |------|-----------|
 |`BUILD_EXAMPLES`|Builds all example programs along with the library into `Build/<BUILD_TYPE>/Examples`|
 |`BUILD_TESTS`|Builds all unit tests along with the library|
+|`CMAKE_BUILD_TYPE`|Specifies the build type for the project with the following available: `Debug`, `Release`, `RelWithDebInfo`|
 
 ## Usage
-
 To use Jobrocket in your project first link the static library built in `/Build/` then add `Jobrocket_Root/Source` to your projects include path.
 
 To use the library and simple tasks, simply include `<Jobrocket/Jobrocket.hpp>`. To use `JobGroup` objects, include `<Jobrocket/JobGroup>`.
