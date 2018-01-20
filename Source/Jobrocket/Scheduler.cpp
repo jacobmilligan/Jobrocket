@@ -12,7 +12,8 @@
 #include "Jobrocket/Scheduler.hpp"
 #include "Jobrocket/Detail/Error.hpp"
 
-#include <hwloc.h>
+#define CPU_INFO_IMPLEMENTATION
+#include <cpu_info.h>
 
 namespace jobrocket {
 
@@ -28,16 +29,18 @@ Scheduler::~Scheduler()
 uint32_t Scheduler::auto_worker_count_value()
 {
     if ( num_cores_ == 0 || num_hw_threads_ == 0 ) {
-        hwloc_topology_t topology;
-        hwloc_topology_init(&topology);
-        hwloc_topology_load(topology);
+        cpui_result result{};
+        auto err = cpui_get_info(&result);
+        if ( err != CPUI_SUCCESS ) {
+            detail::print_error("Scheduler", "Could not retrieve information about the current "
+                "platforms CPU hardware", cpui_error_strings[err]);
+        }
 
         if ( num_cores_ == 0 ) {
-            num_cores_ = static_cast<uint32_t>(hwloc_get_nbobjs_by_type(topology, HWLOC_OBJ_CORE));
+            num_cores_ = result.physical_cores;
         }
         if ( num_hw_threads_ == 0 ) {
-            num_hw_threads_ = static_cast<uint32_t>(hwloc_get_nbobjs_by_type(topology,
-                                                                             HWLOC_OBJ_PU));
+            num_hw_threads_ = result.logical_cores;
         }
     }
 

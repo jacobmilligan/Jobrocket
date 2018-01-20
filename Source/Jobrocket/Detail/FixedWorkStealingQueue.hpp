@@ -124,11 +124,6 @@ public:
         auto b = bottom_.load(std::memory_order_acquire);
         bool result = false;
 
-        // Return false if queue is empty
-        if ( b - t <= 0 ) {
-            return result;
-        }
-
         // Check if queue is non-empty
         if ( t < b ) {
             result = true;

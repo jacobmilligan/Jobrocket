@@ -1,1 +1,1 @@
-jobrocket_add_sources(Error.cpp)
+cu_add_sources(Error.cpp)

@@ -1,8 +1,7 @@
-[submodule "Deps/hwloc"]
-	path = Deps/hwloc
-	url = https://github.com/open-mpi/hwloc.git
-	ignore = dirty
 [submodule "Deps/fmt"]
 	path = Deps/fmt
 	url = https://github.com/fmtlib/fmt.git
 	ignore = dirty
+[submodule "Deps/cpu_info"]
+	path = Deps/cpu_info
+	url = https://github.com/jacobmilligan/cpu_info.git

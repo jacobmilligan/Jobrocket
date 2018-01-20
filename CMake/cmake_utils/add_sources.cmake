@@ -1,8 +1,8 @@
-function(jobrocket_init)
-    unset(jobrocket_sources CACHE)
+function(cu_init_add_sources)
+    unset(cu_source_list CACHE)
 endfunction()
 
-function(jobrocket_add_sources)
+function(cu_add_sources)
     set(srcs)
     foreach(s IN LISTS ARGN)
         if (NOT IS_ABSOLUTE "${s}")
@@ -11,5 +11,5 @@ function(jobrocket_add_sources)
         list(APPEND srcs "${s}")
     endforeach()
 
-    set(jobrocket_sources ${jobrocket_sources} "${srcs}" CACHE INTERNAL "")
+    set(cu_source_list ${cu_source_list} "${srcs}" CACHE INTERNAL "")
 endfunction()

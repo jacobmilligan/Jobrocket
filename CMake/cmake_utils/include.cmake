@@ -1,0 +1,22 @@
+function(cu_init_include)
+    unset(cu_include_list CACHE)
+endfunction()
+
+function(cu_append_includes)
+    set(includes)
+    foreach(i IN LISTS ARGN)
+        if (NOT IS_ABSOLUTE "${i}")
+            get_filename_component(i "${i}" ABSOLUTE)
+        endif ()
+        list(APPEND includes "${i}")
+    endforeach()
+
+    set(cu_include_list ${cu_include_list} "${includes}" CACHE INTERNAL "")
+    MESSAGE("${cu_include_list}")
+endfunction()
+
+function(cu_dump_includes)
+    foreach (i ${cu_include_list})
+        include(${i})
+    endforeach ()
+endfunction()

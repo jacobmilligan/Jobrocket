@@ -18,11 +18,11 @@ void Worker::start()
 {
     thread_ = std::thread(&Worker::main_proc, this);
 
-    while ( true ) {
-        if ( state_ == Worker::State::running ) {
-            break;
-        }
-    }
+//    while ( true ) {
+//        if ( state_ == Worker::State::running ) {
+//            break;
+//        }
+//    }
 }
 
 void Worker::terminate()

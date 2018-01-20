@@ -9,7 +9,7 @@
 //  Copyright (c) 2016 Jacob Milligan. All rights reserved.
 //
 
-#include <Jobrocket/CurrentJobrocket.hpp>
+#include <Jobrocket/Jobrocket.hpp>
 #include <JobRocket/JobGroup.hpp>
 
 #include <fmt/format.h>
