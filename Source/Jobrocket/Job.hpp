@@ -111,5 +111,10 @@ Job make_unmanaged_job(Fn function, Args&& ... args)
     return Job(data.size(), &data, 0);
 }
 
+inline bool is_ready(Job* job)
+{
+    return job != nullptr && job->state == jobrocket::Job::State::ready;
+}
+
 
 }

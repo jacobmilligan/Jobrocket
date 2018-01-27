@@ -42,14 +42,14 @@ Job* Worker::get_next_job()
     Job* next_job = nullptr;
 
     auto pop_success = queue_.pop(next_job);
-    if ( pop_success && next_job != nullptr && next_job->state == jobrocket::Job::State::ready ) {
+    if ( pop_success && is_ready(next_job) ) {
         return next_job;
     }
 
     auto rand_worker = rand_.next() % workers_->size();
     if ( rand_worker != id_ ) {
         auto steal_success = (*workers_)[rand_worker].queue_.steal(next_job);
-        if ( steal_success && next_job != nullptr && next_job->state == jobrocket::Job::State::ready ) {
+        if ( steal_success && is_ready(next_job) ) {
             return next_job;
         }
     }
@@ -91,13 +91,13 @@ void Worker::main_proc()
         if ( active_jobs_->load() <= 0 && !queue_.empty() ) {
             std::unique_lock<std::mutex> lock(*mutex_);
             cv_->wait(lock, [&]() {
-                return active_jobs_->load() > 0 || !queue_.empty() || state_ == State::terminated;
+                return active_jobs_->load() > 0 || state_ == State::terminated;
             });
         }
 
         do {
             try_run_job();
-        } while ( !queue_.empty() && active_jobs_->load() > 0 );
+        } while ( active_jobs_->load() > 0 );
     }
 }
 

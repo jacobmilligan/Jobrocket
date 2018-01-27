@@ -83,14 +83,14 @@ private:
         jobrocket::Job* job = nullptr;
         while ( active_.load() ) {
             auto pop_success = queues[index].pop(job);
-            if ( pop_success && job->state == jobrocket::Job::State::ready ) {
+            if ( pop_success && jobrocket::is_ready(job) ) {
                 job->execute();
                 --job_count;
             } else {
                 auto rand_worker = random_index() % num_threads;
                 if ( rand_worker != index ) {
                     auto steal_success = queues[rand_worker].steal(job);
-                    if ( steal_success && job->state == jobrocket::Job::State::ready ) {
+                    if ( steal_success && jobrocket::is_ready(job) ) {
                         job->execute();
                         --job_count;
                     }

@@ -103,11 +103,11 @@ public:
                 }
 
                 // last element - don't store decremented value
-                bottom_.store(b + 1, std::memory_order_relaxed);
+                bottom_.store(t + 1, std::memory_order_relaxed);
             }
         } else {
             // Empty queue - don't store decremented value
-            bottom_.store(b + 1, std::memory_order_relaxed);
+            bottom_.store(t + 1, std::memory_order_relaxed);
         }
 
         return result;

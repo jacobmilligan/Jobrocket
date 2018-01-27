@@ -69,6 +69,7 @@ TEST_CASE("Workers perform as expected", "[worker]")
     for ( auto& w : workers ) {
         w.terminate();
     }
+    cv.notify_all();
 
     auto actual_result = 0.0;
     for ( double value : values ) {
